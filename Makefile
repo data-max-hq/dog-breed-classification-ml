@@ -1,11 +1,11 @@
 minikube:
-	minikube start  --memory 8192 --cpus 4 --driver=docker --kubernetes-version=v1.21.6
+	minikube start --driver=docker --kubernetes-version=v1.21.6
 
 kubeflow:
 	export PIPELINE_VERSION=1.8.2
 	kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION"
 	kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
-	kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/env/platform-agnostic-pns?ref=$PIPELINE_VERSION"
+	kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
 
 ambassador:
 	helm repo add datawire https://www.getambassador.io
@@ -14,9 +14,6 @@ ambassador:
       --create-namespace \
       --namespace ambassador \
 	  --set service.type=ClusterIP 
-
-port:
-	kubectl port-forward svc/ambassador -n ambassador 8080:80
 
 port-admin:
 	kubectl port-forward svc/ambassador-admin -n ambassador 8877:8877
@@ -33,4 +30,4 @@ seldon-core:
 	  --set enableAES=false 
 	  
 delete:
-	minikube delete --all
+	minikube delete
