@@ -1,6 +1,5 @@
 from apps.DogBreed import DogBreed
 import logging
-import dill
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
@@ -39,6 +38,8 @@ def get_valid_generator():
 
 
 def train():
+    logging.info("Training Model.")
+
     model = tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(16, 3, activation="relu", input_shape=(int(IMG_SIZE), int(IMG_SIZE), 3)),
         tf.keras.layers.MaxPool2D(),
@@ -60,20 +61,10 @@ def train():
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
 
-    tb_callback = tf.keras.callbacks.TensorBoard(log_dir="custom_classifier_logs")
-
     model.fit(train_generator, epochs=2,
-        validation_data=valid_generator,
-        callbacks=[tb_callback]
+        validation_data=valid_generator
     )
     
-    logging.info("Dump models.")
-    with open("models/model.model", "wb") as model_file:
-        dill.dump(model, model_file)
-
-    logging.info("Finished training.")
-
+    model.save('models/dog_model.h5')
 train()
 
-logging.info("Test model prediction.")
-classifier = DogBreed(models_dir="models")
