@@ -1,3 +1,4 @@
+from DogBreed import DogBreed
 import logging
 import dill
 import tensorflow as tf
