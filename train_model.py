@@ -1,4 +1,4 @@
-from DogBreed import DogBreed
+from apps.DogBreed import DogBreed
 import logging
 import dill
 import tensorflow as tf
