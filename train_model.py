@@ -4,7 +4,6 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 
-
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 LR = 6e-4
@@ -65,6 +64,12 @@ def train():
         validation_data=valid_generator
     )
     
+    logging.info("Dump models.")
     model.save('models/dog_model.h5')
+
+    logging.info("Finished training.")
+
 train()
 
+logging.info("Test model prediction.")
+#classifier = DogBreed()

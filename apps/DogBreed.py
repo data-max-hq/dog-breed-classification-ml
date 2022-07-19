@@ -1,39 +1,55 @@
 import io
 import logging
-import numpy as nps
-from PIL import Image
-import dill
 import numpy as np
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
+from PIL import Image
+
+IMG_SIZE = 224
 
 logger = logging.getLogger('__mymodel__')
 
 
-class DogBreed(object):
+class DogBreed():
+  dog_classifier = tf.keras.applications.ResNet50V2(
+      weights="imagenet",
+      input_shape=(int(IMG_SIZE), int(IMG_SIZE), 3)
+  )
 
-  def __init__(self, models_dir="/models"):
-    logger.info("initializing...")
-    logger.info("load model here...")
-    self._models_dir = models_dir
-    logger.info("model has been loaded and initialized...")
-    with open(f"{self._models_dir}/model.model", "rb") as model_file:
-      self._dog_model = dill.load(model_file)
+  def __init__(self):
+      logger.info("initializing...")
+      logger.info("load model here...")
+      self._dog_model = tf.keras.models.load_model('/models/dog_model.h5')
 
+  def is_dog(self,data):
+    probs = self.dog_classifier.predict(data)
+    preds = tf.argmax(probs, axis=1)
+    return ((preds >= 151) & (preds <= 268))
 
+  def predict_breed(self,image):
+      probs = self.dog_model.predict(image)
+      pred = tf.argmax(probs, axis=1)
+      return pred
 
-  def predict(self, X, features_names):
-    """ Seldon Core Prediction API """
- 
-    logger.info("predict called...")
-    # Use Pillow to convert to an RGB image then reverse channels.
-    logger.info('converting tensor to image')
-    img = Image.open(io.BytesIO(X)).convert('RGB')
-    img = np.array(img)
-    img = img[:,:,::-1]
-    logger.info("image size = {}".format(img.shape))
-    if self._model:
-      logger.info("perform inference here...")
-    # This will serialize the image into a JSON tensor
-    logger.info("returning prediction...")
-    # Return the original image sent in RGB
-    return img[:,:,::-1]
+  def predict_dog(self,image):
+      image = image[None,...]
+      if self.is_dog(image):
+          pred =  self.predict_breed(image)
+          print(f"This photo looks like a(n) {pred}.")
+          return
+      print("No dog detected")
+
+  # def predict(self,):
+
+  #   logger.info("predict called...")
+  #   logger.info('converting tensor to image')
+
+    # img = Image.open(io.BytesIO(X)).convert('RGB')
+    # img = np.array(img)
+    # img = img[:,:,::-1]
+    # logger.info("image size = {}".format(img.shape))
+
+    
+    #idx_to_class = {value: key for key, value in train_generator.class_indices.items()}
