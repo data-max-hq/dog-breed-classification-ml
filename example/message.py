@@ -4,6 +4,7 @@ import kfp.components as comp
 import kfp.compiler as compiler
 import kfp.dsl as dsl
 
+# localhost:8877/ambassador/v0/diag/
 
 
 def print_op(msg):
