@@ -21,3 +21,6 @@ delete:
 
 port-kubeflow:
 	kubectl port-forward svc/ml-pipeline-ui -n kubeflow 8081:80
+
+download-images:
+	./script/download-dataset.sh
