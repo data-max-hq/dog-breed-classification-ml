@@ -21,7 +21,7 @@ def get_train_generator():
         horizontal_flip=True
     )
     return data_datagen.flow_from_directory(
-        "dogImages/train/001.Affenpinscher/",
+        "dogImages/train/",
         target_size=(int(IMG_SIZE), int(IMG_SIZE)),
         batch_size=int(BATCH_SIZE),
     )
