@@ -8,7 +8,7 @@ install-ambassador:
 	./script/install-ambassador.sh
 
 port:
-  	kubectl port-forward svc/ambassador-admin -n ambassador 8080:8080
+  	kubectl port-forward svc/ambassador -n ambassador 8080:80
 
 port-admin:
  	kubectl port-forward svc/ambassador-admin -n ambassador 8877:8877
