@@ -21,10 +21,9 @@ def get_train_generator():
         horizontal_flip=True
     )
     return data_datagen.flow_from_directory(
-        "dogImages/train/",
+        "dogImages/train/001.Affenpinscher/",
         target_size=(int(IMG_SIZE), int(IMG_SIZE)),
         batch_size=int(BATCH_SIZE),
-        
     )
 
 def get_valid_generator():
@@ -34,6 +33,14 @@ def get_valid_generator():
         target_size=(int(IMG_SIZE), int(IMG_SIZE)),
         batch_size=int(BATCH_SIZE)
     )
+
+def get_test_generator():
+    data_datagen = ImageDataGenerator(rescale=1./255)
+    return data_datagen.flow_from_directory(
+        "dogImages/test/",
+        target_size=(int(IMG_SIZE), int(IMG_SIZE)),
+        batch_size=int(BATCH_SIZE)
+)
 
 
 def train():
@@ -69,7 +76,13 @@ def train():
 
     logging.info("Finished training.")
 
-train()
+#train()
 
 logging.info("Test model prediction.")
-#classifier = DogBreed()
+classifier = DogBreed(models_dir="models")
+
+train_generator = get_train_generator()
+
+logging.info(classifier.predict(train_generator, ["feature_name"]))
+
+
