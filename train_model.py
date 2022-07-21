@@ -10,7 +10,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 LR = 6e-4
 BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
-EPOCHS = 4
+EPOCHS = 10
 IMG_SIZE = 224
 
 def get_train_generator():
@@ -47,24 +47,30 @@ def get_test_generator():
 def train():
     logging.info("Training Model.")
 
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(16, 3, activation="relu", input_shape=(int(IMG_SIZE), int(IMG_SIZE), 3)),
-        tf.keras.layers.MaxPool2D(),
-        tf.keras.layers.Conv2D(32, 3, activation="relu"),
-        tf.keras.layers.MaxPool2D(),
-        tf.keras.layers.Conv2D(64, 3, activation="relu"),
-        tf.keras.layers.MaxPool2D(),
-        tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(int(NUMBER_OF_NODES), activation="relu"),
-        tf.keras.layers.Dense(133, activation="softmax")
-    ])
+    resnet_body = tf.keras.applications.ResNet50V2(
+        weights="imagenet",
+        include_top=False,
+        input_shape=(int(IMG_SIZE), int(IMG_SIZE), 3)
+    )
+    resnet_body.trainable = False
+    inputs = tf.keras.layers.Input(shape=(int(IMG_SIZE), int(IMG_SIZE), 3))
+    # We make sure that the vgg_body is running in inference mode here,
+    # by passing `training=False`. This is important for fine-tuning, as you will
+    # learn in a few paragraphs.
+    x = resnet_body(inputs, training=False)
+    # Convert features of shape `vgg_body.output_shape[1:]` to vectors
+    x = tf.keras.layers.Flatten()(x)
+    # A Dense classifier (categorical classification)
+    outputs = tf.keras.layers.Dense(133, activation="softmax")(x)
 
-    model.compile(
+    resnet_model = tf.keras.Model(inputs, outputs)
+
+    resnet_model.compile(
         optimizer=tf.optimizers.Adam(learning_rate=float(LR)),
         loss=tf.losses.categorical_crossentropy,
         metrics=["accuracy"]
     )
-    
+
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
@@ -72,17 +78,16 @@ def train():
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
 
-    model.fit(train_generator, epochs=5,
-        validation_data=valid_generator,
-        callbacks=[tensorboard_callback]
-    )
+    resnet_model.fit(train_generator, epochs=int(EPOCHS),
+                     validation_data=valid_generator
+                     )
     
     logging.info("Dump models.")
-    model.save('models/dog_model.h5')
+    resnet_model.save('models/dog_model.h5')
 
     logging.info("Finished training.")
 
-#train()
+# train()
 
 logging.info("Test model prediction.")
 classifier = DogBreed(models_dir="models")
