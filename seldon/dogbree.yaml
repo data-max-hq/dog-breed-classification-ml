@@ -1,23 +1,24 @@
 apiVersion: machinelearning.seldon.io/v1alpha2
 kind: SeldonDeployment
 metadata:
-  name: dog-breed
+  name: dogbreed
+  namespace: seldon
 spec:
-  name: dog-breed-deployment
+  name: dogbreed-deployment
   predictors:
   - componentSpecs:
     - spec:
         containers:
-        - name: dog-breed
-          image: dog-breed:minikube
+        - name: dogbreed
+          image: dogbreed:minikube
     graph:
       children: []
       endpoint:
         type: REST
-      name: classifier
+      name: dogbreed
       type: MODEL
     annotations:
       predictor_version: "0.1"
-      seldon.io/svc-name: dog-breed-svc    
-    name: my-graph
+      seldon.io/svc-name: dogbreed-svc    
+    name: dogbreed-graph
     replicas: 1

@@ -76,7 +76,7 @@ def train():
 
     logging.info("Finished training.")
 
-#train()
+train()
 
 logging.info("Test model prediction.")
 classifier = DogBreed(models_dir="models")

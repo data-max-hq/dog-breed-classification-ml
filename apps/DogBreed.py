@@ -1,5 +1,4 @@
 import logging
-from telnetlib import X3PAD
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from PIL import Image 
