@@ -1,0 +1,8 @@
+usageMetrics:
+  enabled: false
+
+ambassador:
+  enabled: true
+
+certManager:
+  enabled: false

@@ -134,3 +134,4 @@ custom_classifier_logs/
 dogImages/
 .vscode/
 models/
+logs/

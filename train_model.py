@@ -3,6 +3,7 @@ import logging
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
+import datetime
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -64,11 +65,16 @@ def train():
         metrics=["accuracy"]
     )
     
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
 
-    model.fit(train_generator, epochs=2,
-        validation_data=valid_generator
+    model.fit(train_generator, epochs=5,
+        validation_data=valid_generator,
+        callbacks=[tensorboard_callback]
     )
     
     logging.info("Dump models.")
@@ -76,7 +82,7 @@ def train():
 
     logging.info("Finished training.")
 
-train()
+#train()
 
 logging.info("Test model prediction.")
 classifier = DogBreed(models_dir="models")
