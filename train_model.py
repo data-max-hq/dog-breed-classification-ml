@@ -3,14 +3,18 @@ import logging
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
-import datetime
+import matplotlib.pyplot as plt
+import pickle
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+logging.basicConfig()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 LR = 6e-4
 BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
-EPOCHS = 10
+EPOCHS = 1
 IMG_SIZE = 224
 
 def get_train_generator():
@@ -35,15 +39,6 @@ def get_valid_generator():
         batch_size=int(BATCH_SIZE)
     )
 
-def get_test_generator():
-    data_datagen = ImageDataGenerator(rescale=1./255)
-    return data_datagen.flow_from_directory(
-        "dogImages/test/",
-        target_size=(int(IMG_SIZE), int(IMG_SIZE)),
-        batch_size=int(BATCH_SIZE)
-)
-
-
 def train():
     logging.info("Training Model.")
 
@@ -54,26 +49,15 @@ def train():
     )
     resnet_body.trainable = False
     inputs = tf.keras.layers.Input(shape=(int(IMG_SIZE), int(IMG_SIZE), 3))
-    # We make sure that the vgg_body is running in inference mode here,
-    # by passing `training=False`. This is important for fine-tuning, as you will
-    # learn in a few paragraphs.
     x = resnet_body(inputs, training=False)
-    # Convert features of shape `vgg_body.output_shape[1:]` to vectors
     x = tf.keras.layers.Flatten()(x)
-    # A Dense classifier (categorical classification)
     outputs = tf.keras.layers.Dense(133, activation="softmax")(x)
-
     resnet_model = tf.keras.Model(inputs, outputs)
-
     resnet_model.compile(
         optimizer=tf.optimizers.Adam(learning_rate=float(LR)),
         loss=tf.losses.categorical_crossentropy,
         metrics=["accuracy"]
     )
-
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-
 
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
@@ -81,19 +65,27 @@ def train():
     resnet_model.fit(train_generator, epochs=int(EPOCHS),
                      validation_data=valid_generator
                      )
-    
+
     logging.info("Dump models.")
     resnet_model.save('models/dog_model.h5')
 
     logging.info("Finished training.")
 
-# train()
+    labels = train_generator.class_indices
+    with open('models/labels.pickle', 'wb') as handle:
+        pickle.dump(labels, handle)
+    
+#train()
 
 logging.info("Test model prediction.")
 classifier = DogBreed(models_dir="models")
 
 train_generator = get_train_generator()
+image = train_generator.next()[0][0]
+plt.imshow(image)
+plt.show()
+image = image[None,...]
 
-logging.info(classifier.predict(train_generator, ["feature_name"]))
+logging.info(classifier.predict(image))
 
 

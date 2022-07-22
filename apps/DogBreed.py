@@ -1,7 +1,11 @@
 import logging
 import tensorflow as tf
-import matplotlib.pyplot as plt
-from PIL import Image 
+import pickle
+
+logging.basicConfig()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 class DogBreed(object):
 
@@ -10,22 +14,16 @@ class DogBreed(object):
     self._models_dir = models_dir
     logging.info("model has been loaded and initialized...")
     self._dog_model = tf.keras.models.load_model(f"{self._models_dir}/dog_model.h5")
-
+    with open(f"{self._models_dir}/labels.pickle", 'rb') as handle:
+        self._idx_to_class  = pickle.load(handle)
     
-  def predict(self, X, features_names):
-    """ Seldon Core Prediction API """
+    
+  def predict(self, X):
     logging.info("Got request.")
-    logging.info(f"X={X}.")
-    image = X.next()[0][0]
-    plt.imshow(image)
-    plt.savefig('test.png')
-    plt.show()
-    image = image[None,...]
-    probs=self._dog_model.predict(image)
+    probs=self._dog_model.predict(X)
     pred = tf.argmax(probs, axis=1)
-    idx_to_class = {value: key for key, value in X.class_indices.items()}
+    idx_to_class = {value: key for key, value in self._idx_to_class.items()}
     label = idx_to_class[pred.numpy()[0]]
-    print(label.split(".")[-1])
     return label.split(".")[-1]
 
 
