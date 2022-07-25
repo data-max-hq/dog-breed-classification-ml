@@ -5,7 +5,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 import matplotlib.pyplot as plt
 import pickle
-import kfp.dsl as dsl
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -75,24 +74,16 @@ def train():
     labels = train_generator.class_indices
     with open('models/labels.pickle', 'wb') as handle:
         pickle.dump(labels, handle)
-
-@dsl.pipeline(
-    name='DogBreed'
-    description='This is a test model for dogbreed'
-)
-def nlp_pipeline():
     
-
-
-
-        
 #train()
-#logging.info("Test model prediction.")
-#classifier = DogBreed(models_dir="models")
-#train_generator = get_train_generator()
-#image = train_generator.next()[0][0]
-#plt.imshow(image)
-#plt.show()
-#image = image[None,...]
-#
-#logging.info(classifier.predict(image))
+
+logging.info("Test model prediction.")
+classifier = DogBreed(models_dir="models")
+
+train_generator = get_train_generator()
+image = train_generator.next()[0][0]
+plt.imshow(image)
+plt.show()
+image = image[None,...]
+
+logging.info(classifier.predict(image))
