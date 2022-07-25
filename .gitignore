@@ -134,5 +134,4 @@ custom_classifier_logs/
 dogImages/
 .vscode/
 models/dog_model.h5
-logs/
 models/labels.pickle

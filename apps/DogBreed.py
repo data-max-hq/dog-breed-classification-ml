@@ -26,5 +26,3 @@ class DogBreed(object):
     label = idx_to_class[pred.numpy()[0]]
     return label.split(".")[-1]
 
-
-
