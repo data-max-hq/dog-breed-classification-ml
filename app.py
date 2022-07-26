@@ -56,8 +56,7 @@ with tab2:
     if image != None:
         with open(os.path.join("savedimage/001.dog",'dog.png'),"wb") as f:
             f.write((image).getbuffer())
-    # If an image is chosen, show the image and the predict button
-    if image != None:
+        # If an image is chosen, show the image and the predict button
         with st.spinner('Loading image...'):
             time.sleep(0.2)
             st.image(image, use_column_width=True)
@@ -70,3 +69,4 @@ with tab2:
             with st.spinner('Predicting the breed...'):
                 time.sleep(1)
                 st.warning(f'The dog in the photo is: **{classifier.predict(image)}** :sunglasses:')
+
