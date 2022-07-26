@@ -35,7 +35,7 @@ with tab1:
     st.subheader('How to run the project?')
     st.write('First off, clone the repository at: https://github.com/data-max-hq/dog-breed-classification-ml')
     st.code('git clone https://github.com/data-max-hq/dog-breed-classification-ml', 'bash')
-    st.write('Then create a virtual environment inside the project directory. (Remember to use Python 3.8.x.)')
+    st.write('Then create a virtual environment inside the project directory. (Remember to use Python 3.8.x)')
     st.code('python3 -m venv venv', 'bash')
     st.write('Access the virutal environment using this command:')
     st.code('source venv/bin/activate', 'bash')
@@ -56,7 +56,7 @@ with tab2:
     if image != None:
         with open(os.path.join("savedimage/001.dog",'dog.png'),"wb") as f:
             f.write((image).getbuffer())
-        # If an image is chosen, show the image and the predict button
+        # Show the image and the predict button
         with st.spinner('Loading image...'):
             time.sleep(0.2)
             st.image(image, use_column_width=True)
