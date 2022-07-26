@@ -24,5 +24,4 @@ class DogBreed(object):
     pred = tf.argmax(probs, axis=1)
     idx_to_class = {value: key for key, value in self._idx_to_class.items()}
     label = idx_to_class[pred.numpy()[0]]
-    return label.split(".")[-1]
-
+    return label.split(".")[-1].replace('_', ' ')
