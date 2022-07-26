@@ -4,8 +4,10 @@ EXPOSE 8501
 
 WORKDIR /app
 
-RUN pip3 install streamlit==1.11.0
+RUN pip3 install streamlit==1.11.0 tensorflow==2.3.0
 
-COPY . .
+COPY app.py app.py
+COPY ./apps ./apps
+copy ./savedimage ./savedimage
 
-CMD streamlit run streamlit/app.py
+CMD streamlit run app.py
