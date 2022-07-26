@@ -17,13 +17,13 @@ def print_op(msg):
         command=["echo", msg],
     )
 
+
 @dsl.pipeline(
     name="Print Message Kubeflow",
-    description="I want to print a new message to the Kubeflow Pipeline"
+    description="I want to print a new message to the Kubeflow Pipeline",
 )
 def message_pipeline():
     print_message = print_op("Hello World")
-
 
 
 if __name__ == "__main__":
