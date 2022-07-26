@@ -1,7 +1,7 @@
 all: minikube install-seldon-core  install-ambassador install-kubeflow build load ns-seldon apply
 
 minikube:
-	minikube start --driver=docker --kubernetes-version=v1.21.6
+	minikube start --driver=docker --kubernetes-version=v1.21.6 --cpus 4
 
 install-kubeflow:
 	./script/install-kubeflow.sh

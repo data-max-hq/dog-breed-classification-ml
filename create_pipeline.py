@@ -69,17 +69,31 @@ def train():
     with open('models/labels.pickle', 'wb') as handle:
         pickle.dump(labels, handle)
 
-train_model = kfp.components.create_component_from_func(
+
+
+
+vop1 = dsl.VolumeOp(
+        name="create_volume_1",
+        resource_name="vol1",
+        size="1Gi",
+        modes=dsl.VOLUME_MODE_RWM
+    )
+
+
+
+train_model = kfp.components.func_to_container_op(
     func=train,
     base_image='python:3.8',
     packages_to_install=['tensorflow==2.3.0' , 'pillow==7.2.0'])
 
 
 @dsl.pipeline(
-    name="Spark Operator job pipeline",
-    description="Spark Operator job pipeline"
+    name="DogBreed Pipeline",
+    description="This is a Tes for DogBreed Pipeline"
 )
 def train_model_pipeline():
+    """Train model Pipeline"""
+   
     train_model()
 
 

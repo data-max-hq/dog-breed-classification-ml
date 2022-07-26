@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 
 class DogBreed(object):
-
+  """Class DogBreed"""
   def __init__(self, models_dir="/models"):
     logging.info("load model here...")
     self._models_dir = models_dir
@@ -19,6 +19,7 @@ class DogBreed(object):
     
     
   def predict(self, X):
+    """Predict Method"""
     logging.info("Got request.")
     probs=self._dog_model.predict(X)
     pred = tf.argmax(probs, axis=1)

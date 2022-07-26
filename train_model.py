@@ -1,10 +1,10 @@
-from apps.DogBreed import DogBreed
 import logging
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 import matplotlib.pyplot as plt
 import pickle
+import os
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -18,6 +18,7 @@ EPOCHS = 1
 IMG_SIZE = 224
 
 def get_train_generator():
+    """Get The Train Path"""
     data_datagen = ImageDataGenerator(
         rescale=1./255,
         width_shift_range=.2,
@@ -32,6 +33,7 @@ def get_train_generator():
     )
 
 def get_valid_generator():
+    """Get the Valid Path"""
     data_datagen = ImageDataGenerator(rescale=1./255)
     return data_datagen.flow_from_directory(
         "dogImages/valid/",
@@ -40,6 +42,7 @@ def get_valid_generator():
     )
 
 def train():
+    """Train the model"""
     logging.info("Training Model.")
 
     resnet_body = tf.keras.applications.ResNet50V2(
@@ -75,15 +78,9 @@ def train():
     with open('models/labels.pickle', 'wb') as handle:
         pickle.dump(labels, handle)
     
-#train()
 
-logging.info("Test model prediction.")
-classifier = DogBreed(models_dir="models")
-
-train_generator = get_train_generator()
-image = train_generator.next()[0][0]
-plt.imshow(image)
-plt.show()
-image = image[None,...]
-
-logging.info(classifier.predict(image))
+if __name__ == '__main__':
+    os.system("wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip")
+    os.system("unzip -qo dogImages.zip")
+    os.system("rm dogImages.zip")
+    train()
