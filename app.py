@@ -44,7 +44,11 @@ with tab1:
         "git clone https://github.com/data-max-hq/dog-breed-classification-ml", "bash"
     )
     st.write(
+<<<<<<< Updated upstream
         "Then create a virtual environment inside the project directory. (Remember to use Python 3.8.x)"
+=======
+        "Then create a virtual environment inside the project directory. (Remember to use Python 3.8.x.)"
+>>>>>>> Stashed changes
     )
     st.code("python3 -m venv venv", "bash")
     st.write("Access the virutal environment using this command:")
@@ -68,7 +72,12 @@ with tab2:
     if image != None:
         with open(os.path.join("savedimage/001.dog", "dog.png"), "wb") as f:
             f.write((image).getbuffer())
+<<<<<<< Updated upstream
         # Show the image and the predict button
+=======
+    # If an image is chosen, show the image and the predict button
+    if image != None:
+>>>>>>> Stashed changes
         with st.spinner("Loading image..."):
             time.sleep(0.2)
             st.image(image, use_column_width=True)
