@@ -137,3 +137,4 @@ models/dog_model.h5
 logs/
 models/labels.pickle
 savedimage/001.dog/dog.png
+mlruns

@@ -2,9 +2,9 @@ import logging
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
-import matplotlib.pyplot as plt
 import pickle
 import os
+import mlflow
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 LR = 6e-4
 BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
-EPOCHS = 1
+EPOCHS = 3
 IMG_SIZE = 224
 
 
@@ -67,6 +67,8 @@ def train():
 
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
+
+    mlflow.tensorflow.autolog()
 
     resnet_model.fit(
         train_generator, epochs=int(EPOCHS), validation_data=valid_generator
