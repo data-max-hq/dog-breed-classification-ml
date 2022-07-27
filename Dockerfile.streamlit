@@ -7,7 +7,6 @@ WORKDIR /app
 RUN pip3 install streamlit==1.11.0 tensorflow==2.3.0
 
 COPY app.py app.py
-COPY ./apps ./apps
-copy ./savedimage ./savedimage
+COPY ./savedimage ./savedimage
 
 CMD streamlit run app.py

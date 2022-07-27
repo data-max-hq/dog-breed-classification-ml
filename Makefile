@@ -32,9 +32,14 @@ load:
 
 build:
 	docker build -t dogbreed:minikube .
+	docker build -t dogbreed:minikube .
+	docker build -t dogbreed:minikube .
 
 apply:
 	kubectl apply -f ./seldon/dogbreed.yaml
 ns-seldon:
 	kubectl create namespace seldon
 	kubectl label namespace seldon serving.kubeflow.org/inferenceservice=enabled
+
+helm:
+	helmfile apply --concurrency 1	

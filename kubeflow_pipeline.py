@@ -16,11 +16,12 @@ def train_model_pipeline():
         modes=dsl.VOLUME_MODE_RWM,
     )
 
-    step1 = dsl.ContainerOp(
+    dsl.ContainerOp(
         name="Train Model",
         image="trainmodel:minikube",
         pvolumes={"/models": vop1.volume},
     )
+    
 
 
 if __name__ == "__main__":

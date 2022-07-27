@@ -5,6 +5,26 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
 import time
+from seldon_core.seldon_client import SeldonClient
+
+
+def send_client_request(seldon_client,image):
+    client_prediction = seldon_client.predict(
+        data=image,
+        deployment_name="dogbreed",
+        names=["text"],
+        payload_type="ndarray",
+    )
+
+    return client_prediction
+
+
+sc = SeldonClient(
+    gateway="ambassador",
+    transport="rest",
+    gateway_endpoint="ambassador.ambassador.svc",
+    namespace="seldon",
+)
 
 # Function that transforms the image in the required format for the model
 def get_test_generator():
@@ -24,9 +44,6 @@ def is_dog(data):
     preds = tf.argmax(probs, axis=1)
     return (preds >= 151) & (preds <= 268)
 
-
-# Load ResNet50V2 model
-classifier = DogBreed(models_dir="models")
 
 components.html(
     """
@@ -98,5 +115,5 @@ with tab2:
                 with st.spinner("Predicting the breed..."):
                     time.sleep(1)
                     st.warning(
-                        f"The dog in the photo is: **{classifier.predict(image)}** :sunglasses:"
+                        f"The dog in the photo is: **{send_client_request(sc,image)}** :sunglasses:"
                     )
