@@ -29,11 +29,13 @@ download-images:
 
 load:
 	minikube image load dogbreed:minikube
+	minikube image load trainmodel:minikube
+	minikube image load streamlit-app:minikube
 
 build:
 	docker build -t dogbreed:minikube .
-	docker build -t dogbreed:minikube .
-	docker build -t dogbreed:minikube .
+	docker build -t trainmodel:minikube --file Dockerfile.train .
+	docker build -t streamlit:minikube --file Dockerfile.streamlit .
 
 apply:
 	kubectl apply -f ./seldon/dogbreed.yaml
