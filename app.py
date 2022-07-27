@@ -2,6 +2,7 @@ from apps.DogBreed import DogBreed
 import streamlit as st
 import streamlit.components.v1 as components
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
 import os
 import time
 
@@ -11,6 +12,17 @@ def get_test_generator():
     return data_datagen.flow_from_directory(
         "savedimage", target_size=(int(224), int(224)), batch_size=int(32)
     )
+
+
+dog_classifier = tf.keras.applications.ResNet50V2(
+    weights="imagenet", input_shape=(int(224), int(224), 3)
+)
+
+
+def is_dog(data):
+    probs = dog_classifier.predict(data)
+    preds = tf.argmax(probs, axis=1)
+    return (preds >= 151) & (preds <= 268)
 
 
 # Load ResNet50V2 model
@@ -78,8 +90,13 @@ with tab2:
             test_generator = get_test_generator()
             image = test_generator.next()[0][0]
             image = image[None, ...]
-            with st.spinner("Predicting the breed..."):
-                time.sleep(1)
-                st.warning(
-                    f"The dog in the photo is: **{classifier.predict(image)}** :sunglasses:"
-                )
+            if not is_dog(image):
+                with st.spinner("Checking if the image contains a dog..."):
+                    time.sleep(0.5)
+                    st.error("Please enter a dog photo!")
+            else:
+                with st.spinner("Predicting the breed..."):
+                    time.sleep(1)
+                    st.warning(
+                        f"The dog in the photo is: **{classifier.predict(image)}** :sunglasses:"
+                    )
