@@ -4,7 +4,7 @@ EXPOSE 8501
 
 WORKDIR /app
 
-RUN pip3 install streamlit==1.11.0 tensorflow==2.3.0
+RUN pip3 install streamlit==1.11.0 tensorflow==2.3.0 seldon-core==1.14.0
 
 COPY app.py app.py
 COPY ./savedimage ./savedimage

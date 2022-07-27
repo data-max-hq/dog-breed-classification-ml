@@ -11,7 +11,7 @@ from seldon_core.seldon_client import SeldonClient
 def send_client_request(seldon_client,image):
     client_prediction = seldon_client.predict(
         data=image,
-        deployment_name="dogbreed",
+        deployment_name="seldon-dogbreed",
         names=["text"],
         payload_type="ndarray",
     )
