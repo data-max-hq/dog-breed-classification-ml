@@ -1,0 +1,8 @@
+apiVersion: v2
+name: streamlit-app
+description: Chart to deploy a Streamlit app
+version: 1.0.0
+
+keywords:
+  - kubernetes
+  - machine-learning

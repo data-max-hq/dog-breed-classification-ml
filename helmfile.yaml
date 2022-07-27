@@ -1,0 +1,35 @@
+repositories:
+  - name: datawire
+    url: https://www.getambassador.io
+  - name: seldon
+    url: https://storage.googleapis.com/seldon-charts
+
+releases:
+  - name: ambassador
+    namespace: ambassador
+    createNamespace: true
+    labels:
+      job: ambassador
+    chart: datawire/ambassador
+    values:
+      - "./charts/ambassador/values.ambassador.local.yaml"
+    needs:
+      - seldon-system/seldon-core
+  - name: seldon-core
+    namespace: seldon-system
+    createNamespace: true
+    chart: seldon/seldon-core-operator
+    values:
+      - "./charts/seldon-core/values.local.yaml"
+ # - name: seldon-dogbreed
+ #   namespace: seldon
+ #   createNamespace: true
+ #   chart: charts/dogbreed
+ #   values:
+ #     - "./charts/dogbreed/values.yaml"
+  - name: streamlit
+    namespace: app
+    createNamespace: true
+    chart: charts/streamlit
+    values:
+      - "./charts/streamlit/values.yaml"

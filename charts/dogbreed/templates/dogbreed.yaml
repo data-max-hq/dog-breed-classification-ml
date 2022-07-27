@@ -3,22 +3,22 @@ kind: SeldonDeployment
 metadata:
   labels:
     app: seldon
-  name: dogbreed-seldon
+  name: {{ .Release.Name }}
   namespace: seldon
 spec:
-  name: dogbreed-seldon
+  name: {{ .Release.Name }}
   predictors:
-    - name: dogbreed
+    - name: {{ .Release.Name }}
       replicas: 1
       componentSpecs:
         - spec:
             containers:
-              - image: dogbreed:minikube
+              - image: {{ .Values.app.image }}: {{ .Values.app.tag }}
                 imagePullPolicy: IfNotPresent
-                name: dogbreed
+                name: {{ .Release.Name }}
       graph:
         children: []
         endpoint:
           type: REST
-        name: dogbreed
+        name: {{ .Release.Name }}
         type: MODEL

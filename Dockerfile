@@ -14,8 +14,7 @@ RUN pip install -r requirements.txt
 
 # Seldon Core specific
 COPY ./apps .
-COPY ./models/dog_model.h5 /models/dog_model.h5
-COPY ./models/labels.pickle /models/labels.pickle
+#COPY ./models /models
 
 ENV MODEL_NAME DogBreed
 ENV SERVICE_TYPE MODEL

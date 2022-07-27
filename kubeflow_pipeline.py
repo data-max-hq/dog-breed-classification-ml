@@ -22,6 +22,8 @@ def train_model_pipeline():
         pvolumes={"/models": vop1.volume},
     )
 
+    
+
 
 if __name__ == "__main__":
     pipeline_func = train_model_pipeline

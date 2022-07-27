@@ -1,0 +1,8 @@
+apiVersion: v2
+name: seldon-dogbreed
+description: Chart to deploy an DogBreed Classification in Seldon Core.
+version: 1.0.0
+
+keywords:
+  - kubernetes
+  - machine-learning
