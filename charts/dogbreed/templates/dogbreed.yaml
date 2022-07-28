@@ -13,7 +13,7 @@ spec:
       componentSpecs:
         - spec:
             containers:
-              - image: {{ .Values.app.image }}: {{ .Values.app.tag }}
+              - image: {{ .Values.app.image }}:{{ .Values.app.tag }}
                 imagePullPolicy: IfNotPresent
                 name: {{ .Release.Name }}
       graph:

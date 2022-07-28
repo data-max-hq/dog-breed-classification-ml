@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: streamlit
   name: {{ .Release.Name }}
   namespace: app
 spec:
@@ -15,18 +17,11 @@ spec:
     spec:
       containers:
         - name: {{ .Release.Name }}
-          image: {{ .Values.app.image }}: {{ .Values.app.tag }}
+          image: {{ .Values.app.image }}:{{ .Values.app.tag }}
           imagePullPolicy: IfNotPresent
           ports:
-            - name: streamlit
+            - name: streamlit-svc
               containerPort: 8501
-          volumeMounts:
-            - name: model-volume
-              mountPath: /models
-    volumes:
-      - name: model-volume
-        persistentVolumeClaims:
-           claimName: model-volume1
 ---
 
 apiVersion: v1
@@ -40,4 +35,4 @@ spec:
   ports:
     - name: http
       port: 8501
-      targetPort: streamlit
+      targetPort: streamlit-svc

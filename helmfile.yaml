@@ -21,12 +21,14 @@ releases:
     chart: seldon/seldon-core-operator
     values:
       - "./charts/seldon-core/values.local.yaml"
- # - name: seldon-dogbreed
- #   namespace: seldon
- #   createNamespace: true
- #   chart: charts/dogbreed
- #   values:
- #     - "./charts/dogbreed/values.yaml"
+  - name: seldon-dogbreed
+    namespace: seldon
+    createNamespace: true
+    chart: charts/dogbreed
+    values:
+      - "./charts/dogbreed/values.yaml"
+    needs:
+      - seldon-system/seldon-core
   - name: streamlit
     namespace: app
     createNamespace: true

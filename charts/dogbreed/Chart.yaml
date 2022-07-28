@@ -1,5 +1,5 @@
 apiVersion: v2
-name: seldon-dogbreed
+name: dogbreed
 description: Chart to deploy an DogBreed Classification in Seldon Core.
 version: 1.0.0
 

@@ -30,7 +30,7 @@ download-images:
 load:
 	minikube image load dogbreed:minikube
 	minikube image load trainmodel:minikube
-	minikube image load streamlit-app:minikube
+	minikube image load streamlit:minikube
 
 build:
 	docker build -t dogbreed:minikube .
