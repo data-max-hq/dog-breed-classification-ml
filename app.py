@@ -19,18 +19,16 @@ logger.setLevel(logging.INFO)
 def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
-        deployment_name="seldon-dogbreed",
-        names=["text"],
         payload_type="ndarray",
     )
     return client_prediction
 
 
 sc = SeldonClient(
-    gateway="ambassador",
+    gateway="seldon",
     transport="rest",
-    gateway_endpoint="ambassador.ambassador.svc",
-    namespace="seldon",
+    gateway_endpoint="192.168.1.110:9000",
+    microservice_endpoint="192.168.1.110:9000",
 )
 
 # Function that transforms the image in the required format for the model
@@ -126,10 +124,11 @@ with tab2:
                     # logging.info(prediction)
                     # logging.info(result)
                     # logging.info(data)
-                    time.sleep(1)
-                    data = image.tolist()
-                    response = requests.post(
-                        "http://192.168.1.110:9000/predict", json=json.dumps(data)
-                    )
-                    logging.info(response)
+                    # time.sleep(1)
+                    # data = image.tolist()
+                    # response = requests.post(
+                    #     "http://192.168.1.110:9000/predict", json=json.dumps(data)
+                    # )
+                    # logging.info(response)
+                    st.warning(send_client_request(sc, image))
                     # st.warning(f"The dog in the photo is: **{result}** :sunglasses:")

@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   seldon:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports: 
       - "9000:9000"
     depends_on: 
