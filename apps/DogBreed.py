@@ -18,7 +18,7 @@ class DogBreed(object):
         with open(f"{self._models_dir}/labels.pickle", "rb") as handle:
             self._idx_to_class = pickle.load(handle)
 
-    def predict(self, X,feature_names):
+    def predict(self, X):
         """Predict Method"""
         logging.info(X)
         logging.info("Got request.")

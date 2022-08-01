@@ -1,19 +1,22 @@
-from argparse import Namespace
 import streamlit as st
 import streamlit.components.v1 as components
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
 import time
+import json
 from seldon_core.seldon_client import SeldonClient
 import logging
+import requests
+import scipy
 
 
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def send_client_request(seldon_client,image):
+
+def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
         deployment_name="seldon-dogbreed",
@@ -117,13 +120,16 @@ with tab2:
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    prediction=send_client_request(sc,image)
-                    data=prediction.response.get("data")
-                    result=data.get("ndarray")
-                    logging.info(prediction)
-                    logging.info(result)
-                    logging.info(data)
+                    # prediction = send_client_request(sc, image)
+                    # data = prediction.response.get("data")
+                    # result = data.get("ndarray")
+                    # logging.info(prediction)
+                    # logging.info(result)
+                    # logging.info(data)
                     time.sleep(1)
-                    st.warning(
-                        f"The dog in the photo is: **{result}** :sunglasses:"
+                    data = image.tolist()
+                    response = requests.post(
+                        "http://192.168.1.110:9000/predict", json=json.dumps(data)
                     )
+                    logging.info(response)
+                    # st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
