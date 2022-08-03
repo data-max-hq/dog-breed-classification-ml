@@ -10,11 +10,11 @@ WORKDIR /app
 
 
 COPY requirements.txt requirements.txt 
-RUN pip install -r requirements.txt 
+RUN pip3 install -r requirements.txt 
 
 # Seldon Core specific
-COPY ./apps .
-COPY ./models /models
+COPY /apps .
+COPY ./models .
 
 ENV MODEL_NAME DogBreed
 ENV SERVICE_TYPE MODEL

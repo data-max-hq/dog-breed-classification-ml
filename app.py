@@ -1,40 +1,40 @@
-from argparse import Namespace
 import streamlit as st
 import streamlit.components.v1 as components
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
 from seldon_core.seldon_client import SeldonClient
 import logging
+import numpy as np
+from PIL import Image
 
 
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def send_client_request(seldon_client,image):
+
+def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
-        deployment_name="seldon-dogbreed",
-        names=["text"],
-        payload_type="ndarray",
+        payload_type="tensor",
     )
     return client_prediction
 
 
 sc = SeldonClient(
-    gateway="ambassador",
+    gateway="seldon",
     transport="rest",
-    gateway_endpoint="ambassador.ambassador.svc",
-    namespace="seldon",
+    gateway_endpoint="192.168.1.110:9000",
+    microservice_endpoint="192.168.1.110:9000",
 )
 
 # Function that transforms the image in the required format for the model
 def get_test_generator():
     data_datagen = ImageDataGenerator(rescale=1.0 / 255)
     return data_datagen.flow_from_directory(
-        "savedimage", target_size=(int(224), int(224)), batch_size=int(32)
+        "savedimage", target_size=(int(224), int(224)), batch_size=int(1)
     )
 
 
@@ -106,7 +106,7 @@ with tab2:
             time.sleep(0.2)
             st.image(image, use_column_width=True)
             predict_button = st.button("Predict", 2)
-        # If predict button is clicked, transform the image, serve it to the model and output the prediction.
+        # If predict button is clicked, transform the image, test if it is a dog image, serve it to the model and output the prediction.
         if predict_button != False:
             test_generator = get_test_generator()
             image = test_generator.next()[0][0]
@@ -117,13 +117,6 @@ with tab2:
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    prediction=send_client_request(sc,image)
-                    data=prediction.response.get("data")
-                    result=data.get("ndarray")
-                    logging.info(prediction)
-                    logging.info(result)
-                    logging.info(data)
-                    time.sleep(1)
-                    st.warning(
-                        f"The dog in the photo is: **{result}** :sunglasses:"
-                    )
+                    prediction = send_client_request(sc, image)
+                    result = prediction.response["strData"]
+                    st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
