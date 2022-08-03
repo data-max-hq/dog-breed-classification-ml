@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
 from seldon_core.seldon_client import SeldonClient
@@ -108,10 +108,8 @@ with tab2:
             predict_button = st.button("Predict", 2)
         # If predict button is clicked, transform the image, test if it is a dog image, serve it to the model and output the prediction.
         if predict_button != False:
-            image = Image.open(f"savedimage/001.dog/dog.png")
-            image = image.resize((224, 224))
-            image = np.array(image)
-            image = image / 255
+            test_generator = get_test_generator()
+            image = test_generator.next()[0][0]
             image = image[None, ...]
             if not is_dog(image):
                 with st.spinner("Checking if the image contains a dog..."):

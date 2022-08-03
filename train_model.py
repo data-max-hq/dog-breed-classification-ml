@@ -1,6 +1,6 @@
 import logging
 import tensorflow as tf
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 import pickle
 import os

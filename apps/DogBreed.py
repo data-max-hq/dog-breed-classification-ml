@@ -31,10 +31,8 @@ class DogBreed(object):
             self.load()
         logging.info("Model loaded.")
         logging.info(X)
-        int_image = X.astype(np.uint8)
-
         logging.info("Got request.")
-        probs = self._dog_model.predict(int_image)
+        probs = self._dog_model.predict(X)
         logging.info(f"probs: {probs}")
         pred = tf.argmax(probs, axis=1)
         logging.info(pred)
