@@ -7,10 +7,10 @@ WORKDIR /app
 COPY constraint.txt constraint.txt
 RUN pip install streamlit==1.11.1 -c constraint.txt
 
-RUN pip3 install tensorflow==2.9.1 seldon-core==1.14.0 scipy==1.9.0
+COPY requirements-streamlit.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY app.py app.py
 COPY ./savedimage ./savedimage
-#COPY ./models ./models     
 
 CMD streamlit run app.py

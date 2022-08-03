@@ -4,11 +4,10 @@ from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
 import time
-import json
 from seldon_core.seldon_client import SeldonClient
 import logging
-import requests
-import scipy
+import numpy as np
+from PIL import Image
 
 
 logging.basicConfig()
@@ -19,7 +18,7 @@ logger.setLevel(logging.INFO)
 def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
-        payload_type="ndarray",
+        payload_type="tensor",
     )
     return client_prediction
 
@@ -35,7 +34,7 @@ sc = SeldonClient(
 def get_test_generator():
     data_datagen = ImageDataGenerator(rescale=1.0 / 255)
     return data_datagen.flow_from_directory(
-        "savedimage", target_size=(int(224), int(224)), batch_size=int(32)
+        "savedimage", target_size=(int(224), int(224)), batch_size=int(1)
     )
 
 
@@ -107,10 +106,12 @@ with tab2:
             time.sleep(0.2)
             st.image(image, use_column_width=True)
             predict_button = st.button("Predict", 2)
-        # If predict button is clicked, transform the image, serve it to the model and output the prediction.
+        # If predict button is clicked, transform the image, test if it is a dog image, serve it to the model and output the prediction.
         if predict_button != False:
-            test_generator = get_test_generator()
-            image = test_generator.next()[0][0]
+            image = Image.open(f"savedimage/001.dog/dog.png")
+            image = image.resize((224, 224))
+            image = np.array(image)
+            image = image / 255
             image = image[None, ...]
             if not is_dog(image):
                 with st.spinner("Checking if the image contains a dog..."):
@@ -118,17 +119,6 @@ with tab2:
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    # prediction = send_client_request(sc, image)
-                    # data = prediction.response.get("data")
-                    # result = data.get("ndarray")
-                    # logging.info(prediction)
-                    # logging.info(result)
-                    # logging.info(data)
-                    # time.sleep(1)
-                    # data = image.tolist()
-                    # response = requests.post(
-                    #     "http://192.168.1.110:9000/predict", json=json.dumps(data)
-                    # )
-                    # logging.info(response)
-                    st.warning(send_client_request(sc, image))
-                    # st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+                    prediction = send_client_request(sc, image)
+                    result = prediction.response["strData"]
+                    st.warning(f"The dog in the photo is: **{result}** :sunglasses:")

@@ -1,0 +1,4 @@
+tensorflow==2.9.1
+seldon-core==1.14.0
+scipy==1.9.0
+pillow==7.2.0
