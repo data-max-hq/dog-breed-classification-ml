@@ -44,4 +44,16 @@ ns-seldon:
 	kubectl label namespace seldon serving.kubeflow.org/inferenceservice=enabled
 
 helm:
-	helmfile apply --concurrency 1	
+	helmfile apply --concurrency 1
+
+zenml:
+	zenml integration install kubeflow
+	zenml container-registry register local_container_registry --type=default --uri=localhost:5000 
+	zenml orchestrator register kubeflow_orchestrator --type=kubeflow
+	zenml stack register kubeflow_stack \
+		-m default \
+		-a default \
+		-o kubeflow_orchestrator \
+		-c local_container_registry
+	zenml stack set kubeflow_stack
+	zenml stack up
