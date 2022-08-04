@@ -1,11 +1,13 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
 from seldon_core.seldon_client import SeldonClient
 import logging
+import numpy as np
+from PIL import Image
 
 from PIL import Image
 import numpy as np
@@ -27,12 +29,29 @@ def send_client_request(seldon_client,image):
 
 
 sc = SeldonClient(
-    gateway="ambassador",
+    gateway="seldon",
     transport="rest",
-    gateway_endpoint="ambassador.ambassador.svc",
-    namespace="seldon",
+    gateway_endpoint="192.168.1.110:9000",
+    microservice_endpoint="192.168.1.110:9000",
 )
 
+# Function that transforms the image in the required format for the model
+def get_test_generator():
+    data_datagen = ImageDataGenerator(rescale=1.0 / 255)
+    return data_datagen.flow_from_directory(
+        "savedimage", target_size=(int(224), int(224)), batch_size=int(1)
+    )
+
+
+dog_classifier = tf.keras.applications.ResNet50V2(
+    weights="imagenet", input_shape=(int(224), int(224), 3)
+)
+
+
+def is_dog(data):
+    probs = dog_classifier.predict(data)
+    preds = tf.argmax(probs, axis=1)
+    return (preds >= 151) & (preds <= 268)
 
 components.html(
     """
@@ -89,14 +108,17 @@ with tab2:
             time.sleep(0.2)
             st.image(image, use_column_width=True)
             predict_button = st.button("Predict", 2)
- 
+        # If predict button is clicked, transform the image, test if it is a dog image, serve it to the model and output the prediction.
         if predict_button != False:
-            image = Image.open("savedimage/001.dog/dog.png")
-            image = image.resize((224,224))
-            img_array = np.array(image)
-            img_array= img_array[None , ...]
-            
-            with st.spinner("Predicting the breed..."):
-                predictions = send_client_request(sc,  img_array)
-                st.write(predictions.response.get('strData'))
-                   
+            test_generator = get_test_generator()
+            image = test_generator.next()[0][0]
+            image = image[None, ...]
+            if not is_dog(image):
+                with st.spinner("Checking if the image contains a dog..."):
+                    time.sleep(0.5)
+                    st.error("Please enter a dog photo!")
+            else:
+                with st.spinner("Predicting the breed..."):
+                    prediction = send_client_request(sc, image)
+                    result = prediction.response["strData"]
+                    st.warning(f"The dog in the photo is: **{result}** :sunglasses:")

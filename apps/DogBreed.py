@@ -2,6 +2,7 @@ import logging
 import tensorflow as tf
 import numpy as np
 import pickle
+import numpy as np
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -17,7 +18,6 @@ class DogBreed(object):
         self._models_dir = models_dir
 
     def load(self):
-
         self._dog_model = tf.keras.models.load_model(f"{self._models_dir}/dog_model.h5")
         with open(f"{self._models_dir}/labels.pickle", "rb") as handle:
             self._idx_to_class = pickle.load(handle)
@@ -29,7 +29,6 @@ class DogBreed(object):
         if not self.loaded:
             logging.info("Not loaded yet.")
             self.load()
-
         logging.info("Model loaded.")
         logging.info(X)
         logging.info("Got request.")

@@ -4,11 +4,10 @@ EXPOSE 8501
 
 WORKDIR /app
 
-
-RUN pip3 install tensorflow==2.3.0 seldon-core==1.14.0  pillow==7.2.0  streamlit==1.11.1
+COPY requirements-streamlit.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY app.py app.py
 COPY ./savedimage ./savedimage
-#COPY ./models ./models     
 
 CMD streamlit run app.py

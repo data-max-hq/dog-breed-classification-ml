@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  seldon:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "9000:9000"
+    depends_on: 
+      - streamlit
+  streamlit:
+    build: 
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    
+    
