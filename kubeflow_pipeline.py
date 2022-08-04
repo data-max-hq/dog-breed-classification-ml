@@ -3,27 +3,19 @@ import kfp
 import kfp.components as comp
 import kfp.compiler as compiler
 import kfp.dsl as dsl
-
+from kubernetes import client, config
 
 @dsl.pipeline(
     name="DogBreed Classification", description="Just a test pipeline for dogbreed"
 )
 def train_model_pipeline():
-    vop1 = dsl.VolumeOp(
-        name="Create Volume",
-        resource_name="vol1",
-        size="1Gi",
-        modes=dsl.VOLUME_MODE_RWM,
-    )
 
     dsl.ContainerOp(
-        name="Train Model",
-        image="trainmodel:minikube",
-        pvolumes={"/models": vop1.volume},
-    )
-    
+         name="train-model",
+         image="trainmodel:minikube",
+     ).add_volume(client.V1Volume(name='model-volume' ,host_path=client.V1HostPathVolumeSource("/mnt"))).add_volume_mount(client.V1VolumeMount(
+      mount_path='/models', name='model-volume')) 
 
-    
 
 
 if __name__ == "__main__":

@@ -9,16 +9,21 @@ import logging
 import numpy as np
 from PIL import Image
 
+from PIL import Image
+import numpy as np
+from numpy import asarray
+
 
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def send_client_request(seldon_client, image):
+def send_client_request(seldon_client,image):
     client_prediction = seldon_client.predict(
         data=image,
-        payload_type="tensor",
+        deployment_name="seldon-dogbreed",
+        payload_type="ndarray",
     )
     return client_prediction
 
@@ -48,7 +53,6 @@ def is_dog(data):
     preds = tf.argmax(probs, axis=1)
     return (preds >= 151) & (preds <= 268)
 
-
 components.html(
     """
     <style>svg{
@@ -63,7 +67,7 @@ components.html(
 
 tab1, tab2 = st.tabs(["📰 Intro", "🐶 Predict"])
 
-# Introduction Tab
+
 with tab1:
     st.title("Dog Breed Classification")
     st.write(
@@ -94,14 +98,12 @@ with tab1:
 # Prediction Tab
 with tab2:
     st.header("Upload a dog photo and press the Predict button to get a prediction!")
-    # File Uploader for the image
+
     image = st.file_uploader("Dog Photo: ", type=["jpg", "png", "jpeg"], key=1)
-    # If the user has chosen an image, save it locally
-    # Image gets replaced everytime the user chooses a different image
+
     if image != None:
         with open(os.path.join("savedimage/001.dog", "dog.png"), "wb") as f:
             f.write((image).getbuffer())
-        # Show the image and the predict button
         with st.spinner("Loading image..."):
             time.sleep(0.2)
             st.image(image, use_column_width=True)

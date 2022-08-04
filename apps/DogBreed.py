@@ -1,5 +1,6 @@
 import logging
 import tensorflow as tf
+import numpy as np
 import pickle
 import numpy as np
 
@@ -11,20 +12,19 @@ logger.setLevel(logging.INFO)
 class DogBreed(object):
     """Class DogBreed"""
 
-    def __init__(self, models_dir="dog_model.h5"):
+    def __init__(self, models_dir="/models"):
         self.loaded = False
         logging.info("load model here...")
         self._models_dir = models_dir
 
     def load(self):
-
-        self._dog_model = tf.keras.models.load_model(f"{self._models_dir}")
-        with open("labels.pickle", "rb") as handle:
+        self._dog_model = tf.keras.models.load_model(f"{self._models_dir}/dog_model.h5")
+        with open(f"{self._models_dir}/labels.pickle", "rb") as handle:
             self._idx_to_class = pickle.load(handle)
         self.loaded = True
         logging.info("model has been loaded and initialized...")
 
-    def predict(self, X, feature_names):
+    def predict(self, X, feature_names=None):
         """Predict Method"""
         if not self.loaded:
             logging.info("Not loaded yet.")
