@@ -1,14 +1,15 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import os
 import time
-import json
 from seldon_core.seldon_client import SeldonClient
 import logging
-import requests
-import scipy
+
+from PIL import Image
+import numpy as np
+from numpy import asarray
 
 
 logging.basicConfig()
@@ -16,38 +17,21 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def send_client_request(seldon_client, image):
+def send_client_request(seldon_client,image):
     client_prediction = seldon_client.predict(
         data=image,
+        deployment_name="seldon-dogbreed",
         payload_type="ndarray",
     )
     return client_prediction
 
 
 sc = SeldonClient(
-    gateway="seldon",
+    gateway="ambassador",
     transport="rest",
-    gateway_endpoint="192.168.1.110:9000",
-    microservice_endpoint="192.168.1.110:9000",
+    gateway_endpoint="ambassador.ambassador.svc",
+    namespace="seldon",
 )
-
-# Function that transforms the image in the required format for the model
-def get_test_generator():
-    data_datagen = ImageDataGenerator(rescale=1.0 / 255)
-    return data_datagen.flow_from_directory(
-        "savedimage", target_size=(int(224), int(224)), batch_size=int(32)
-    )
-
-
-dog_classifier = tf.keras.applications.ResNet50V2(
-    weights="imagenet", input_shape=(int(224), int(224), 3)
-)
-
-
-def is_dog(data):
-    probs = dog_classifier.predict(data)
-    preds = tf.argmax(probs, axis=1)
-    return (preds >= 151) & (preds <= 268)
 
 
 components.html(
@@ -64,7 +48,7 @@ components.html(
 
 tab1, tab2 = st.tabs(["📰 Intro", "🐶 Predict"])
 
-# Introduction Tab
+
 with tab1:
     st.title("Dog Breed Classification")
     st.write(
@@ -95,40 +79,24 @@ with tab1:
 # Prediction Tab
 with tab2:
     st.header("Upload a dog photo and press the Predict button to get a prediction!")
-    # File Uploader for the image
+
     image = st.file_uploader("Dog Photo: ", type=["jpg", "png", "jpeg"], key=1)
-    # If the user has chosen an image, save it locally
-    # Image gets replaced everytime the user chooses a different image
+
     if image != None:
         with open(os.path.join("savedimage/001.dog", "dog.png"), "wb") as f:
             f.write((image).getbuffer())
-        # Show the image and the predict button
         with st.spinner("Loading image..."):
             time.sleep(0.2)
             st.image(image, use_column_width=True)
             predict_button = st.button("Predict", 2)
-        # If predict button is clicked, transform the image, serve it to the model and output the prediction.
+ 
         if predict_button != False:
-            test_generator = get_test_generator()
-            image = test_generator.next()[0][0]
-            image = image[None, ...]
-            if not is_dog(image):
-                with st.spinner("Checking if the image contains a dog..."):
-                    time.sleep(0.5)
-                    st.error("Please enter a dog photo!")
-            else:
-                with st.spinner("Predicting the breed..."):
-                    # prediction = send_client_request(sc, image)
-                    # data = prediction.response.get("data")
-                    # result = data.get("ndarray")
-                    # logging.info(prediction)
-                    # logging.info(result)
-                    # logging.info(data)
-                    # time.sleep(1)
-                    # data = image.tolist()
-                    # response = requests.post(
-                    #     "http://192.168.1.110:9000/predict", json=json.dumps(data)
-                    # )
-                    # logging.info(response)
-                    st.warning(send_client_request(sc, image))
-                    # st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+            image = Image.open("savedimage/001.dog/dog.png")
+            image = image.resize((224,224))
+            img_array = np.array(image)
+            img_array= img_array[None , ...]
+            
+            with st.spinner("Predicting the breed..."):
+                predictions = send_client_request(sc,  img_array)
+                st.write(predictions.response.get('strData'))
+                   

@@ -1,12 +1,13 @@
 FROM python:3.8
 
-WORKDIR /app
+RUN mkdir /models
 
+WORKDIR /app
 COPY requirements.txt requirements.txt 
 RUN pip install -r requirements.txt 
 
 COPY ./train_model.py .
-COPY ./models ./models
+#COPY ./models ./models
 
 
 EXPOSE 5000

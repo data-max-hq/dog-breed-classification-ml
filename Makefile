@@ -1,6 +1,6 @@
-all: minikube install-seldon-core  install-ambassador install-kubeflow build load ns-seldon apply
+all: minikube install-seldon-core  install-ambassador install-kubeflow build load  apply
 
-minikube:
+start:
 	minikube start --driver=docker --kubernetes-version=v1.21.6 --cpus 4
 
 install-kubeflow:
@@ -29,12 +29,12 @@ download-images:
 
 load:
 	minikube image load dogbreed:minikube
-	minikube image load trainmodel:minikube
+	# minikube image load trainmodel:minikube
 	minikube image load streamlit:minikube
 
 build:
 	docker build -t dogbreed:minikube .
-	docker build -t trainmodel:minikube --file Dockerfile.train .
+	# docker build -t trainmodel:minikube --file Dockerfile.train .
 	docker build -t streamlit:minikube --file Dockerfile.streamlit .
 
 apply:
@@ -44,4 +44,4 @@ ns-seldon:
 	kubectl label namespace seldon serving.kubeflow.org/inferenceservice=enabled
 
 helm:
-	helmfile apply --concurrency 1	
+	helmfile sync

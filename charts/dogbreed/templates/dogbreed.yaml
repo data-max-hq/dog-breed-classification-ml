@@ -16,6 +16,13 @@ spec:
               - image: {{ .Values.app.image }}:{{ .Values.app.tag }}
                 imagePullPolicy: IfNotPresent
                 name: {{ .Release.Name }}
+                volumeMounts:
+                  - name: models
+                    mountPath: /models
+            volumes:
+              - name: models
+                hostPath:
+                  path: /mnt
       graph:
         children: []
         endpoint:

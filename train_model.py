@@ -1,10 +1,13 @@
-import logging
 import tensorflow as tf
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 import pickle
 import os
 import mlflow
+from PIL import Image
+import numpy as np
+import logging
+
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -14,7 +17,7 @@ logger.setLevel(logging.INFO)
 LR = 6e-4
 BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
-EPOCHS = 3
+EPOCHS = 1
 IMG_SIZE = 224
 
 
@@ -75,19 +78,19 @@ def train():
     )
 
     logging.info("Dump models.")
-    resnet_model.save("models/dog_model.h5")
+    resnet_model.save("/models/dog_model.h5")
 
     logging.info("Finished training.")
 
     labels = train_generator.class_indices
-    with open("models/labels.pickle", "wb") as handle:
+    with open("/models/labels.pickle", "wb") as handle:
         pickle.dump(labels, handle)
 
 
 if __name__ == "__main__":
-    # os.system(
-    # "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
-    # )
-    # os.system("unzip -qo dogImages.zip")
-    # os.system("rm dogImages.zip")
+    os.system(
+    "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
+    )
+    os.system("unzip -qo dogImages.zip")
+    os.system("rm dogImages.zip")
     train()

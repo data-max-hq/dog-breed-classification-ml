@@ -6,6 +6,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive && apt-get install -y \
    python3-setuptools && \
 apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
+
+RUN mkdir /models
+
 WORKDIR /app
 
 
@@ -14,7 +17,7 @@ RUN pip install -r requirements.txt
 
 # Seldon Core specific
 COPY /apps .
-COPY ./models .
+#COPY ./models /models
 
 ENV MODEL_NAME DogBreed
 ENV SERVICE_TYPE MODEL

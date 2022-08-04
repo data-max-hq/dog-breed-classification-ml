@@ -4,10 +4,8 @@ EXPOSE 8501
 
 WORKDIR /app
 
-COPY constraint.txt constraint.txt
-RUN pip install streamlit==1.11.1 -c constraint.txt
 
-RUN pip3 install tensorflow==2.9.1 seldon-core==1.14.0 scipy==1.9.0
+RUN pip3 install tensorflow==2.3.0 seldon-core==1.14.0  pillow==7.2.0  streamlit==1.11.1
 
 COPY app.py app.py
 COPY ./savedimage ./savedimage
