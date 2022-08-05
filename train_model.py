@@ -4,8 +4,6 @@ from PIL import ImageFile
 import pickle
 import os
 import mlflow
-from PIL import Image
-import numpy as np
 import logging
 
 
@@ -89,7 +87,7 @@ def train():
 
 if __name__ == "__main__":
     os.system(
-    "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
+        "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
     )
     os.system("unzip -qo dogImages.zip")
     os.system("rm dogImages.zip")

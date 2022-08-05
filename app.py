@@ -6,12 +6,6 @@ import os
 import time
 from seldon_core.seldon_client import SeldonClient
 import logging
-import numpy as np
-from PIL import Image
-
-from PIL import Image
-import numpy as np
-from numpy import asarray
 
 
 logging.basicConfig()
@@ -19,7 +13,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def send_client_request(seldon_client,image):
+def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
         deployment_name="seldon-dogbreed",
@@ -31,8 +25,8 @@ def send_client_request(seldon_client,image):
 sc = SeldonClient(
     gateway="seldon",
     transport="rest",
-    gateway_endpoint="192.168.1.110:9000",
-    microservice_endpoint="192.168.1.110:9000",
+    gateway_endpoint="seldon:9000",
+    microservice_endpoint="seldon:9000",
 )
 
 # Function that transforms the image in the required format for the model
@@ -52,6 +46,7 @@ def is_dog(data):
     probs = dog_classifier.predict(data)
     preds = tf.argmax(probs, axis=1)
     return (preds >= 151) & (preds <= 268)
+
 
 components.html(
     """

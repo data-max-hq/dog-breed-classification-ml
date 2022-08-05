@@ -1,8 +1,6 @@
 import logging
 import tensorflow as tf
-import numpy as np
 import pickle
-import numpy as np
 
 logging.basicConfig()
 logger = logging.getLogger()
