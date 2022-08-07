@@ -47,13 +47,13 @@ helm:
 	helmfile sync
 
 zenml:
-	zenml integration install kubeflow
-	zenml container-registry register local_container_registry --type=default --uri=localhost:5000 
-	zenml orchestrator register kubeflow_orchestrator --type=kubeflow
-	zenml stack register kubeflow_stack \
+	zenml integration install kubeflow tensorflow -y
+	zenml container-registry register local_container_registry --flavor=default --uri=localhost:5000 	
+	zenml orchestrator register kubeflow_orchestrator --flavor=kubeflow
+	zenml stack register my_stack \
 		-m default \
 		-a default \
 		-o kubeflow_orchestrator \
 		-c local_container_registry
-	zenml stack set kubeflow_stack
+	zenml stack set my_stack
 	zenml stack up

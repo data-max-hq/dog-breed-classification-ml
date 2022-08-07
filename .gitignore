@@ -138,3 +138,4 @@ logs/
 models/labels.pickle
 savedimage/001.dog/dog.png
 mlruns
+/zenml/.zenconfig
