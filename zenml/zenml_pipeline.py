@@ -1,6 +1,6 @@
 from zenml.pipelines import pipeline
 from zenml.steps import step,Output
-from zenml.integrations.constants import KUBEFLOW, SELDON, TENSORFLOW
+from zenml.integrations.constants import KUBEFLOW, SELDON
 # from zenml.integrations.seldon.model_deployers import SeldonModelDeployer
 # from zenml.integrations.seldon.services import SeldonDeploymentService
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -19,21 +19,15 @@ from zenml.materializers.base_materializer import BaseMaterializer
 #         self.name = name
 
 
-class MyMaterializer(BaseMaterializer):
+class ModelMaterializer(BaseMaterializer):
     ASSOCIATED_TYPES = (tf.keras.Model,)
     ASSOCIATED_ARTIFACT_TYPES = (DataArtifact,)
 
-    def handle_input(self, data_type: Type[tf.keras.Model]) -> tf.keras.Model:
+    def handle_input(self, data_type:Type[tf.keras.Model]) -> tf.keras.Model:
         """Read from artifact store"""
         super().handle_input(data_type)
         dog_model = tf.keras.models.load_model(f"{self.artifact.uri}/dog_model.h5")
-        name = dog_model.read()
 
-        # with open(f"{self.artifact.uri}/labels.pickle", "rb") as handle:
-        #     idx_to_class = pickle.load(handle)
-
-        # with fileio.open(os.path.join(self.artifact.uri, 'dog_model.h5'), 'r') as f:
-        #     name = f.read()
         return dog_model
 
     def handle_return(self, my_obj: tf.keras.Model) -> None:
@@ -41,28 +35,54 @@ class MyMaterializer(BaseMaterializer):
         super().handle_return(my_obj)
         with fileio.open(os.path.join(self.artifact.uri, 'dog_model.h5'), 'w') as f:
             f.write(my_obj.name)
-        # with open(f"{self.artifact.uri}/labels.pickle", "wb") as handle:
-        #     pickle.dump(labels, handle)
-
-        # Problem is that we want to save at artifact store dog_model and also lables.pickle
-        # But there is an error when we dump labels as pickle file,bcs labels are not defined
 
 
-@step()
+class LabelsMaterializer(BaseMaterializer):
+    ASSOCIATED_TYPES = (pickle.Pickler,)
+    ASSOCIATED_ARTIFACT_TYPES = (DataArtifact,)
+
+    def handle_input(self, data_type:Type[pickle.Pickler]) -> pickle.Pickler:
+        """Read from artifact store"""
+        super().handle_input(data_type)
+
+        with open(f"{self.artifact.uri}/labels.pickle", "rb") as handle:
+            idx_to_class = pickle.load(handle)
+
+        return idx_to_class
+
+    def handle_return(self, my_obj: pickle.Pickler) -> None:
+        """Write to artifact store"""
+        super().handle_return(my_obj)
+        with fileio.open(os.path.join(self.artifact.uri,'labels.pickle'), "wb") as handle:
+            handle.write(my_obj.name)
+
+LR = 6e-4
+BATCH_SIZE = 32
+NUMBER_OF_NODES = 256
+EPOCHS = 1
+IMG_SIZE = 224
+
+def train_generator():
+    data_datagen = ImageDataGenerator(
+        rescale=1.0 / 255,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        brightness_range=[0.5, 1.5],
+        horizontal_flip=True,
+    )
+    return data_datagen.flow_from_directory(
+        "dogImages/train/",
+        target_size=(int(IMG_SIZE), int(IMG_SIZE)),
+        batch_size=int(BATCH_SIZE),
+    )
+
+@step(enable_cache=True)
 def train() -> tf.keras.Model:
     ImageFile.LOAD_TRUNCATED_IMAGES = True
 
     logging.basicConfig()
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-
-    LR = 6e-4
-    BATCH_SIZE = 32
-    NUMBER_OF_NODES = 256
-    EPOCHS = 1
-    IMG_SIZE = 224
-
-    logging.info("Training...")
 
     resnet_body = tf.keras.applications.ResNet50V2(
         weights="imagenet",
@@ -81,21 +101,6 @@ def train() -> tf.keras.Model:
         metrics=["accuracy"],
     )
 
-    data_datagen = ImageDataGenerator(
-        rescale=1.0 / 255,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        brightness_range=[0.5, 1.5],
-        horizontal_flip=True,
-    )
-    train_generator = data_datagen.flow_from_directory(
-        "dogImages/train/",
-        target_size=(int(IMG_SIZE), int(IMG_SIZE)),
-        batch_size=int(BATCH_SIZE),
-    )
-
-    logging.info("Got here ...")
-
     data_datagen_2 = ImageDataGenerator(rescale=1.0 / 255)
     valid_generator = data_datagen_2.flow_from_directory(
         "dogImages/valid/",
@@ -105,30 +110,37 @@ def train() -> tf.keras.Model:
 
     # mlflow.tensorflow.autolog()
 
+    t_generator = train_generator()
     resnet_model.fit(
-        train_generator, epochs=int(EPOCHS), validation_data=valid_generator
+        t_generator, epochs=int(EPOCHS), validation_data=valid_generator
     )
 
-    #os.system("mkdir models_2")
-
-    resnet_model.save("models_2/dog_model.h5")
-
-    logging.info("Got here 222...")
-
-    labels = train_generator.class_indices
-    with open("models_2/labels.pickle", "wb") as handle:
-        pickle.dump(labels, handle)
-
-    logging.info("Finished...")
+    # This save might not needed when using
+    #  zenml bcs zenml saves model when doing return in step
+    resnet_model.save("models_2/dog_model.h5") 
 
     return resnet_model
 
+@step
+def save_labels() -> dict:
+    t_generator = train_generator()
+    labels = t_generator.class_indices
+    
+    # This save might also not be needed when
+    #  using zenml bcs zenml saves labels when doing return in step
+    with open("models_2/labels.pickle", "wb") as handle:
+        pickle.dump(labels, handle)
+        
+    return labels
 
-@pipeline(enable_cache=False, required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt")
+
+@pipeline(required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt")
 def first_pipeline(
-    train
+    train,
+    save_labels
 ):
-    trained_model = train()
+    train()
+    save_labels()
 
 
 if __name__ == "__main__":
@@ -139,8 +151,8 @@ if __name__ == "__main__":
     # os.system("rm dogImages.zip")
 
     my_pipeline = first_pipeline(
-        train = train().with_return_materializers(MyMaterializer)
+        train = train().with_return_materializers(ModelMaterializer),
+        save_labels = save_labels()#.with_return_materializers(LabelsMaterializer)
     )
-    logging.info("Got here 3333..")
 
     my_pipeline.run()
