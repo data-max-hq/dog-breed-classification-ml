@@ -1,18 +1,23 @@
 from zenml.pipelines import pipeline
-from zenml.steps import step,Output
+from zenml.steps import step,Output,BaseStepConfig,STEP_ENVIRONMENT_NAME,StepContext
 from zenml.integrations.constants import KUBEFLOW, SELDON
-# from zenml.integrations.seldon.model_deployers import SeldonModelDeployer
-# from zenml.integrations.seldon.services import SeldonDeploymentService
+from zenml.integrations.seldon.model_deployers import SeldonModelDeployer
+from zenml.integrations.seldon.services import SeldonDeploymentService
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from zenml.integrations.seldon.services.seldon_deployment import (
+  SeldonDeploymentConfig,
+  SeldonDeploymentService,
+)
 from PIL import ImageFile
 import tensorflow as tf
 import pickle, os, logging
+import numpy as np
 # import mlflow
-from typing import Type
-from zenml.artifacts import DataArtifact
+from typing import Type,cast
+from zenml.artifacts import DataArtifact,ModelArtifact
 from zenml.io import fileio
 from zenml.materializers.base_materializer import BaseMaterializer
-
+from zenml.environment import Environment
 
 # class MyObj(tf.keras.Model):
 #     def __init__(self, name: str):
@@ -134,25 +139,154 @@ def save_labels() -> dict:
     return labels
 
 
-@pipeline(required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt")
+# Get image data from streamlit 
+# @step
+# def dynamic_data_importer() -> Output(data=np.ndarray):
+#     return np.array([[1, 2, 3], [4, 5, 6]], np.int32)
+    
+
+
+# class SeldonDeploymentLoaderStepConfig(BaseStepConfig):
+#     """Seldon deployment loader configuration
+#     Attributes:
+#         pipeline_name: name of the pipeline that deployed the Seldon prediction
+#             server
+#         step_name: the name of the step that deployed the Seldon prediction
+#             server
+#         model_name: the name of the model that was deployed
+#     """
+
+#     pipeline_name: str
+#     step_name: str
+#     model_name: str
+
+# @step(enable_cache=False)
+# def prediction_service_loader(
+#     config: SeldonDeploymentLoaderStepConfig,
+# ) -> SeldonDeploymentService:
+#     """Get the prediction service started by the deployment pipeline"""
+
+#     model_deployer = SeldonModelDeployer.get_active_model_deployer()
+
+#     services = model_deployer.find_model_server(
+#         pipeline_name=config.pipeline_name,
+#         pipeline_step_name=config.step_name,
+#         model_name=config.model_name,
+#     )
+#     if not services:
+#         raise RuntimeError(
+#             f"No Seldon Core prediction server deployed by the "
+#             f"'{config.step_name}' step in the '{config.pipeline_name}' "
+#             f"pipeline for the '{config.model_name}' model is currently "
+#             f"running."
+#         )
+
+#     if not services[0].is_running:
+#         raise RuntimeError(
+#             f"The Seldon Core prediction server last deployed by the "
+#             f"'{config.step_name}' step in the '{config.pipeline_name}' "
+#             f"pipeline for the '{config.model_name}' model is not currently "
+#             f"running."
+#         )
+
+#     return cast(SeldonDeploymentService, services[0])
+
+
+# @step
+# def predictor(
+#     service: SeldonDeploymentService,
+#     data: np.ndarray,
+# ) -> str: #Output(predictions=np.ndarray):
+#     """Run a inference request against a prediction service"""
+
+#     service.start(timeout=120)  # should be a NOP if already started
+#     prediction = service.predict(data)
+#     prediction = prediction.argmax(axis=-1)
+#     idx_to_class = {value: key for key, value in idx_to_class.items()}
+#     logging.info(idx_to_class)
+#     label = idx_to_class[prediction.numpy()[0]]
+#     logging.info("Return prediction.")
+#     return label.split(".")[-1].replace("_", " ")
+
+#     # print("Prediction: ", prediction)
+#     # return prediction
+
+
+# @pipeline(
+#     enable_cache=True, required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt"
+# )
+# def continuous_deployment_pipeline(
+#     train,
+#     save_labels,
+#     model_deployer
+# ):
+#     model = train()
+#     labels = save_labels()
+#     model_deployer(model,labels)
+
+
+# @pipeline(
+#     enable_cache=True, required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt"
+# )
+# def inference_pipeline(
+#     dynamic_data_importer,
+#     prediction_service_loader,
+#     predictor,
+# ):
+#     data = dynamic_data_importer()
+#     model_deployment_service = prediction_service_loader()
+#     predictor(model_deployment_service,data)
+
+
+
+@step(enable_cache=True)
+def seldon_model_deployer_step(
+  context: StepContext,
+  model: ModelArtifact,
+) -> SeldonDeploymentService:
+    model_deployer = SeldonModelDeployer.get_active_model_deployer()
+
+    # get pipeline name, step name and run id
+    step_env = Environment()[STEP_ENVIRONMENT_NAME]
+
+    service_config=SeldonDeploymentConfig(
+        model_uri=model.uri,
+        model_name="dog_model.h5",
+        replicas=1,
+        implementation="TENSORFLOW_SERVER",
+        pipeline_name = step_env.pipeline_name,
+        pipeline_run_id = step_env.pipeline_run_id,
+        pipeline_step_name = step_env.step_name,
+    )
+
+    service = model_deployer.deploy_model(
+        service_config, replace=True, timeout=300
+    )
+
+    print(
+        f"Seldon deployment service started and reachable at:\n"
+        f"    {service.prediction_url}\n"
+    )
+
+    return service
+
+@pipeline(
+    enable_cache=True, required_integrations=[KUBEFLOW],requirements="zenml_requirements.txt"
+)
 def first_pipeline(
     train,
-    save_labels
+    save_labels,
+    seldon_model_deployer_step,
 ):
-    train()
-    save_labels()
-
+    train = train()
+    save_labels = save_labels()
+    seldon_model_deployer_step()
 
 if __name__ == "__main__":
-    # os.system(
-    #     "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
-    # )
-    # os.system("unzip -qo dogImages.zip")
-    # os.system("rm dogImages.zip")
-
     my_pipeline = first_pipeline(
         train = train().with_return_materializers(ModelMaterializer),
-        save_labels = save_labels()#.with_return_materializers(LabelsMaterializer)
+        save_labels = save_labels(),#.with_return_materializers(LabelsMaterializer)
+        service = seldon_model_deployer_step()
     )
 
     my_pipeline.run()

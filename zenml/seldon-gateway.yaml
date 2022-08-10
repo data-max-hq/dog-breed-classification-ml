@@ -1,0 +1,15 @@
+apiVersion: getambassador.io/v1alpha3
+kind: Gateway
+metadata:
+  name: seldon-gateway
+  namespace: ambassador
+spec:
+  selector:
+    ambassador: ambassadorgateway
+  servers:
+  - port:
+      number: 8080
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
