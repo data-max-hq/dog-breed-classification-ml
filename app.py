@@ -66,7 +66,7 @@ tab1, tab2 = st.tabs(["📰 Intro", "🐶 Predict"])
 with tab1:
     st.write("# Dog Breed Classification")
     st.write(
-        "A demo that uses a ResNet model to predict the breed of a dog in a photo."
+        "#### A demo that uses a ResNet model to predict the breed of a dog in a photo."
     )
     st.write("## *Prerequisites:*")
     st.write("- **Python 3.8.13**")

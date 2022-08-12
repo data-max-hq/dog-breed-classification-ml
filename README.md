@@ -1,8 +1,6 @@
 # Dog Breed Classification
 #### A demo that uses a ResNet model to predict the breed of a dog given in a photo.
 
----
-
 ### *Prerequisites:*
 - **Python 3.8.13**
 - **Docker and Docker Compose**
