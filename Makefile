@@ -47,7 +47,7 @@ helm:
 	helmfile sync
 
 install-zenml:
-	zenml integration install kubeflow -y
+	zenml integration install kubeflow seldon-y
 	zenml container-registry register local_container_registry --flavor=default --uri=localhost:5000 	
 	zenml orchestrator register kubeflow_orchestrator --flavor=kubeflow
 	zenml stack register my_stack \
@@ -60,8 +60,8 @@ install-zenml:
 
 seldon-zenml:
 	zenml model-deployer register seldon_deployer --flavor=seldon \
-		--kubernetes_context=k3d-zenml \
-		--kubernetes_namespace=seldon-system \
-		--base_url=http://localhost:8080/seldon/
+		--kubernetes_context= <Cluster name> \
+		--kubernetes_namespace=kubeflow \
+		--base_url=http://localhost:8080/seldon/kubeflow/zenml/api/v1.0
 	
 	zenml stack update my_stack --model_deployer=seldon_deployer
