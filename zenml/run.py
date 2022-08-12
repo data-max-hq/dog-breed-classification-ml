@@ -1,10 +1,12 @@
 from typing import cast
 from zenml_pipeline import (
     SeldonDeploymentLoaderStepConfig,
+    TensorflowTrainerConfig,
     train,
     save_labels,
     dynamic_data_importer,
     prediction_service_loader,
+    evaluator,
     predictor,
     continuous_deployment_pipeline,
     inference_pipeline
@@ -49,17 +51,21 @@ def main(config: str):
     predict = config == PREDICT or config == DEPLOY_AND_PREDICT
 
     seldon_implementation = "TENSORFLOW_SERVER"
-    model_name = "dog_breed.h5"
+    model_name = "dog-breed"
     deployment_pipeline_name = "continuous_deployment_pipeline"
     deployer_step_name = "seldon_model_deployer_step"
+
+    trainer_config = TensorflowTrainerConfig(epochs=1, lr=0.003)
+    trainer = train(trainer_config)
 
     model_deployer = SeldonModelDeployer.get_active_model_deployer()
 
     if deploy:
         # Initialize a continuous deployment pipeline run
         deployment = continuous_deployment_pipeline(
-            train = train(),
+            trainer = trainer,
             save_labels = save_labels(),
+            evaluator = evaluator(),
             model_deployer=seldon_model_deployer_step(
                 config=SeldonDeployerStepConfig(
                     service_config=SeldonDeploymentConfig(
@@ -75,7 +81,7 @@ def main(config: str):
     if predict:
         # Initialize an inference pipeline run
         inference = inference_pipeline(
-            data = dynamic_data_importer(),
+            dynamic_data_importer(),
             prediction_service_loader=prediction_service_loader(
                 SeldonDeploymentLoaderStepConfig(
                     pipeline_name=deployment_pipeline_name,
