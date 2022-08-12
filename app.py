@@ -64,31 +64,22 @@ tab1, tab2 = st.tabs(["📰 Intro", "🐶 Predict"])
 
 
 with tab1:
-    st.title("Dog Breed Classification")
+    st.write("# Dog Breed Classification")
     st.write(
-        "This is a project that uses a trained CNN model to accurately predict the breed of a dog based on the picture given as input.🐕"
+        "A demo that uses a ResNet model to predict the breed of a dog in a photo."
     )
-    st.subheader("How to run the project?")
-    st.write(
-        "First off, clone the repository at: https://github.com/data-max-hq/dog-breed-classification-ml"
-    )
-    st.code(
-        "git clone https://github.com/data-max-hq/dog-breed-classification-ml", "bash"
-    )
-    st.write(
-        "Then create a virtual environment inside the project directory. (Remember to use Python 3.8.x)"
-    )
-    st.code("python3 -m venv venv", "bash")
-    st.write("Access the virutal environment using this command:")
-    st.code("source venv/bin/activate", "bash")
-    st.write(
-        "You can get a model with high accuracy at the link in the project Readme. You will also need a *labels.pickle* file for the model."
-    )
-    st.write("Now install the requirements for the project.")
-    st.code("pip install streamlit==1.11.0 tensorflow==2.3.0", "python")
-    st.write("Now all that is left is to run the streamlit server:")
-    st.code("streamlit run app.py")
-    st.subheader("Enjoy! 🎊")
+    st.write("## *Prerequisites:*")
+    st.write("- **Python 3.8.13**")
+    st.write("- **Docker and Docker Compose**")
+    st.write("- **k3d Cluster**")
+    st.write("- **ZenML**")
+    st.write("## *How to run the project with docker:*")
+    st.write("1. Start by cloning the repository.", "bash")
+    st.code("git clone https://github.com/data-max-hq/dog-breed-classification-ml.git")
+    st.write("2. Open the project directory in terminal and type:")
+    st.code("pip install -r requirements.txt", "bash")
+    st.write("3. Build the docker images and run the containers.")
+    st.code("docker compose up --build", "bash")
 
 # Prediction Tab
 with tab2:
