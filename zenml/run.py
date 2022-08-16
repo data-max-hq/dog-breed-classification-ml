@@ -1,4 +1,3 @@
-from typing import cast
 from zenml_pipeline import (
     SeldonDeploymentLoaderStepConfig,
     TensorflowTrainerConfig,
@@ -6,12 +5,11 @@ from zenml_pipeline import (
     save_labels,
     dynamic_data_importer,
     prediction_service_loader,
-    evaluator,
+    tf_evaluator,
     predictor,
     continuous_deployment_pipeline,
-    inference_pipeline
+    inference_pipeline,
 )
-from rich import print
 from zenml.integrations.seldon.model_deployers import SeldonModelDeployer
 from zenml.integrations.seldon.services import (
     SeldonDeploymentConfig,
@@ -21,7 +19,11 @@ from zenml.integrations.seldon.steps import (
     SeldonDeployerStepConfig,
     seldon_model_deployer_step,
 )
+from rich import print
+from typing import cast
+import logging
 import click
+import os
 
 DEPLOY = "deploy"
 PREDICT = "predict"
@@ -40,7 +42,6 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
     "(`predict`). By default both will be run "
     "(`deploy_and_predict`).",
 )
-
 def main(config: str):
     """Run the Seldon example continuous deployment or inference pipeline
     Example usage:
@@ -57,21 +58,24 @@ def main(config: str):
 
     trainer_config = TensorflowTrainerConfig(epochs=1, lr=0.003)
     trainer = train(trainer_config)
+    evaluator = tf_evaluator()
 
     model_deployer = SeldonModelDeployer.get_active_model_deployer()
 
     if deploy:
         # Initialize a continuous deployment pipeline run
         deployment = continuous_deployment_pipeline(
-            trainer = trainer,
-            save_labels = save_labels(),
-            evaluator = evaluator(),
+            trainer=trainer,
+            save_labels=save_labels(),
+            evaluator=evaluator,
             model_deployer=seldon_model_deployer_step(
                 config=SeldonDeployerStepConfig(
                     service_config=SeldonDeploymentConfig(
                         model_name=model_name,
+                        replicas=1,
                         implementation=seldon_implementation,
-                    )
+                    ),
+                    timeout=120,
                 )
             ),
         )
@@ -126,4 +130,9 @@ def main(config: str):
 
 
 if __name__ == "__main__":
+    # os.system(
+    #     "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
+    # )
+    # os.system("unzip -qo dogImages.zip")
+    # os.system("rm dogImages.zip")
     main()

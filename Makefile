@@ -47,7 +47,7 @@ helm:
 	helmfile sync
 
 install-zenml:
-	zenml integration install kubeflow seldon-y
+	zenml integration install kubeflow seldon -y
 	zenml container-registry register local_container_registry --flavor=default --uri=localhost:5000 	
 	zenml orchestrator register kubeflow_orchestrator --flavor=kubeflow
 	zenml stack register my_stack \

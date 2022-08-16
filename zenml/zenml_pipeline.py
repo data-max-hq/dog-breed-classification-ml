@@ -1,23 +1,25 @@
 from zenml.pipelines import pipeline
-from zenml.steps import step,Output,BaseStepConfig,STEP_ENVIRONMENT_NAME,StepContext
+from zenml.steps import step, Output, BaseStepConfig, STEP_ENVIRONMENT_NAME, StepContext
 from zenml.integrations.constants import KUBEFLOW, SELDON
 from zenml.integrations.seldon.model_deployers import SeldonModelDeployer
 from zenml.integrations.seldon.services import SeldonDeploymentService
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from zenml.integrations.seldon.services.seldon_deployment import (
-  SeldonDeploymentConfig,
-  SeldonDeploymentService,
+    SeldonDeploymentConfig,
+    SeldonDeploymentService,
 )
+from zenml.artifacts import DataArtifact, ModelArtifact
+from zenml.io import fileio
+from zenml.materializers.base_materializer import BaseMaterializer
+from zenml.environment import Environment
+
 from PIL import ImageFile
 import tensorflow as tf
 import pickle, os, logging
 import numpy as np
+
 # import mlflow
-from typing import Type,cast
-from zenml.artifacts import DataArtifact,ModelArtifact
-from zenml.io import fileio
-from zenml.materializers.base_materializer import BaseMaterializer
-from zenml.environment import Environment
+from typing import Type, cast
 
 # class MyObj(tf.keras.Model):
 #     def __init__(self, name: str):
@@ -28,7 +30,7 @@ class ModelMaterializer(BaseMaterializer):
     ASSOCIATED_TYPES = (tf.keras.Model,)
     ASSOCIATED_ARTIFACT_TYPES = (ModelArtifact,)
 
-    def handle_input(self, data_type:Type[tf.keras.Model]) -> tf.keras.Model:
+    def handle_input(self, data_type: Type[tf.keras.Model]) -> tf.keras.Model:
         """Read from artifact store"""
         super().handle_input(data_type)
         dog_model = tf.keras.models.load_model(f"{self.artifact.uri}/dog-model")
@@ -38,7 +40,7 @@ class ModelMaterializer(BaseMaterializer):
     def handle_return(self, my_obj: tf.keras.Model) -> None:
         """Write to artifact store"""
         super().handle_return(my_obj)
-        with fileio.open(os.path.join(self.artifact.uri, 'dog-model'), 'w') as f:
+        with fileio.open(os.path.join(self.artifact.uri, "dog-model"), "w") as f:
             f.write(my_obj.name)
 
 
@@ -47,6 +49,7 @@ BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
 EPOCHS = 1
 IMG_SIZE = 224
+
 
 def train_generator():
     data_datagen = ImageDataGenerator(
@@ -62,6 +65,7 @@ def train_generator():
         batch_size=int(BATCH_SIZE),
     )
 
+
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -72,6 +76,7 @@ class TensorflowTrainerConfig(BaseStepConfig):
 
     epochs: int = 1
     lr: float = 0.001
+
 
 @step(enable_cache=True)
 def train(config: TensorflowTrainerConfig) -> tf.keras.Model:
@@ -104,37 +109,38 @@ def train(config: TensorflowTrainerConfig) -> tf.keras.Model:
     # mlflow.tensorflow.autolog()
 
     t_generator = train_generator()
-    resnet_model.fit(
-        t_generator, epochs=int(EPOCHS), validation_data=valid_generator
-    )
+    resnet_model.fit(t_generator, epochs=int(EPOCHS), validation_data=valid_generator)
 
     # This save might not needed when using
     #  zenml bcs zenml saves model when doing return in step
-    resnet_model.save("models_2/dog-model") 
+    resnet_model.save("models_2/dog-model")
 
     return resnet_model
+
 
 @step
 def save_labels() -> dict:
     t_generator = train_generator()
     labels = t_generator.class_indices
-    
+
     # This save might also not be needed when
     #  using zenml bcs zenml saves labels when doing return in step
-    with open("models_2/labels.pickle", "wb") as handle:
-        pickle.dump(labels, handle)
-        
+    # with open("models_2/labels.pickle", "wb") as handle:
+    #     pickle.dump(labels, handle)
+
     return labels
 
 
-# Get image data from streamlit 
+# Get image data from streamlit
 @step
 def dynamic_data_importer() -> Output(data=np.ndarray):
     return np.array([[1, 2, 3], [4, 5, 6]], np.int32)
-    
+
+
 @step
-def evaluator() -> bool:
+def tf_evaluator() -> bool:
     return True
+
 
 class SeldonDeploymentLoaderStepConfig(BaseStepConfig):
     """Seldon deployment loader configuration
@@ -149,6 +155,7 @@ class SeldonDeploymentLoaderStepConfig(BaseStepConfig):
     pipeline_name: str
     step_name: str
     model_name: str
+
 
 @step(enable_cache=False)
 def prediction_service_loader(
@@ -189,7 +196,7 @@ def prediction_service_loader(
 def predictor(
     service: SeldonDeploymentService,
     data: np.ndarray,
-) -> str: #Output(predictions=np.ndarray):
+) -> str:  # Output(predictions=np.ndarray):
     """Run a inference request against a prediction service"""
 
     service.start(timeout=120)  # should be a NOP if already started
@@ -201,15 +208,13 @@ def predictor(
     logging.info("Return prediction.")
     return label.split(".")[-1].replace("_", " ")
 
+
 @pipeline(
-    enable_cache=True, required_integrations=[KUBEFLOW,SELDON],requirements="zenml_requirements.txt"
+    enable_cache=True,
+    required_integrations=[KUBEFLOW, SELDON],
+    requirements="zenml_requirements.txt",
 )
-def continuous_deployment_pipeline(
-    trainer,
-    save_labels,
-    evaluator,
-    model_deployer
-):
+def continuous_deployment_pipeline(trainer, save_labels, evaluator, model_deployer):
     model = trainer()
     labels = save_labels()
     evaluat = evaluator()
@@ -217,7 +222,9 @@ def continuous_deployment_pipeline(
 
 
 @pipeline(
-    enable_cache=True, required_integrations=[KUBEFLOW,SELDON],requirements="zenml_requirements.txt"
+    enable_cache=True,
+    required_integrations=[KUBEFLOW, SELDON],
+    requirements="zenml_requirements.txt",
 )
 def inference_pipeline(
     dynamic_data_importer,
@@ -226,7 +233,7 @@ def inference_pipeline(
 ):
     data = dynamic_data_importer()
     model_deployment_service = prediction_service_loader()
-    predictor(model_deployment_service,data)
+    predictor(model_deployment_service, data)
 
 
 # @step(enable_cache=True)
@@ -238,11 +245,11 @@ def inference_pipeline(
 
 #   # get pipeline name, step name and run id
 #   step_env = Environment()[STEP_ENVIRONMENT_NAME]
-  
+
 #   logging.info("Model uri -->",model.uri)
 #   service_config = SeldonDeploymentConfig(
 #       model_uri=model.uri,
-#       model_name="dog_model.h5",
+#       model_name="dog-model",
 #       implementation="TENSORFLOW_SERVER",
 #       pipeline_name = step_env.pipeline_name,
 #       pipeline_run_id = step_env.pipeline_run_id,
