@@ -18,7 +18,11 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
 ```bash
 pip install -r requirements.txt
 ```
-3. Build the docker images and run the containers.
+3. Train the model (only once):
+```bash
+python3 train_model.py
+```
+4. Build the docker images and run the containers.
 ```bash
 docker compose up --build
 ```
