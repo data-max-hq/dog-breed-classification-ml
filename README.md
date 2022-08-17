@@ -40,7 +40,6 @@ zenml stack up
 
 ### Install seldon
 ```bash
-cd ..
 make install-seldon-core
 ```
 
@@ -58,13 +57,12 @@ kubectl -n emissary wait --for condition=available --timeout=90s deploy -lproduc
 zenml model-deployer register seldon_deployer --flavor=seldon \
   --kubernetes_context=<CLUSTER_NAME> \
   --kubernetes_namespace=kubeflow \
-  --base_url=http://localhost:8080/seldon/kubeflow/zenml/api/v1.0/
+  --base_url=http://localhost:8080/
  
 zenml stack update my_stack --model_deployer=seldon_deployer
 ```
 ### Run pipeline
 ```bash
-cd zenml
 python run.py
 ```
 

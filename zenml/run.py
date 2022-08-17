@@ -21,7 +21,6 @@ from zenml.integrations.seldon.steps import (
 )
 from rich import print
 from typing import cast
-import logging
 import click
 import os
 
@@ -130,9 +129,9 @@ def main(config: str):
 
 
 if __name__ == "__main__":
-    # os.system(
-    #     "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
-    # )
-    # os.system("unzip -qo dogImages.zip")
-    # os.system("rm dogImages.zip")
+    os.system(
+        "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
+    )
+    os.system("unzip -qo dogImages.zip")
+    os.system("rm dogImages.zip")
     main()
