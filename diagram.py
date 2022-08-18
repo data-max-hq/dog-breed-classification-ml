@@ -14,21 +14,23 @@ from diagrams.k8s.ecosystem import Helm
 # helm = Helm('package manager')
 # st = Custom('UI','resources/streamlit.png')
 
-with Diagram("Local w/o K8s", "diagram1", "TB", "ortho", "svg"):
+with Diagram(
+    "Local w/o K8s", "diagrams/diagram1", "TB", "ortho", ["pdf", "png"], False
+):
 
     user = User("user")
 
     with Cluster("training"):
         source = Internet("source")
-        tf = Custom("trainer", "resources/tf.png")
-        model = Custom("model", "resources/model.png")
+        tf = Custom("trainer", "../resources/tf.png")
+        model = Custom("model", "../resources/model.png")
     with Cluster("docker compose", "TB"):
         docker = Docker("docker")
         with Cluster("dashboard"):
-            st = Custom("UI", "resources/streamlit.png")
+            st = Custom("UI", "../resources/streamlit.png")
             output = Client("output")
         with Cluster("model server"):
-            seldon = Custom("serve", "resources/seldon.png")
+            seldon = Custom("serve", "../resources/seldon.png")
         (
             st
             >> Edge(color="red", style="dashed")
