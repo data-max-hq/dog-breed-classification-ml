@@ -76,12 +76,12 @@ def train():
     )
 
     logging.info("Dump models.")
-    resnet_model.save("/models/dog_model.h5")
+    resnet_model.save("dog_model/1")
 
     logging.info("Finished training.")
 
     labels = train_generator.class_indices
-    with open("/models/labels.pickle", "wb") as handle:
+    with open("dog_model/1/labels.pickle", "wb") as handle:
         pickle.dump(labels, handle)
 
 

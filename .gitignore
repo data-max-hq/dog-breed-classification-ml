@@ -138,3 +138,8 @@ logs/
 models/labels.pickle
 savedimage/001.dog/dog.png
 mlruns
+labels/labels.pickle
+dog_model/1/keras_metadata.pb
+dog_model/1/saved_model.pb
+dog_model/1/variables/variables.data-00000-of-00001
+dog_model/1/variables/variables.index
