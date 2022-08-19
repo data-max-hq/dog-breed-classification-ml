@@ -128,13 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /.idea/
-
-
-custom_classifier_logs/
-dogImages/
 .vscode/
-models/dog_model.h5
-logs/
-models/labels.pickle
-savedimage/001.dog/dog.png
-mlruns
+models/

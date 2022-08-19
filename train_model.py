@@ -5,8 +5,9 @@ import pickle
 import os
 import mlflow
 import logging
-
-
+import json
+import requests
+import pickle
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 logging.basicConfig()
@@ -76,19 +77,40 @@ def train():
     )
 
     logging.info("Dump models.")
-    resnet_model.save("/models/dog_model.h5")
+    resnet_model.save("./models/dog_model")
 
     logging.info("Finished training.")
 
     labels = train_generator.class_indices
-    with open("/models/labels.pickle", "wb") as handle:
+    with open("./models/labels.pickle", "wb") as handle:
         pickle.dump(labels, handle)
 
 
 if __name__ == "__main__":
+   
     os.system(
         "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
     )
     os.system("unzip -qo dogImages.zip")
     os.system("rm dogImages.zip")
     train()
+    
+    # test_generator = get_train_generator()
+    # image = test_generator.next()[0][0]
+    # image = image[None, ...]
+
+    # url = "http://localhost:8501/v1/models/dog_model:predict"
+    # data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
+    # headers = {"Content-Type": "application/json"}
+    # response = requests.post(url, data=data, headers=headers)
+    # prediction = json.loads(response.text)["predictions"]
+    # pred = tf.argmax(prediction, axis=1)
+    # with open("./models/labels.pickle", "rb") as handle:
+    #     idx_to_class1 = pickle.load(handle)
+
+    # idx_to_class = {value: key for key, value in idx_to_class1.items()}
+    # label = idx_to_class[pred.numpy()[0]]
+
+    # print(label.split(".")[-1].replace("_", " "))
+
+

@@ -6,7 +6,9 @@ import os
 import time
 from seldon_core.seldon_client import SeldonClient
 import logging
-
+import json
+import requests
+import pickle
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -88,7 +90,7 @@ with tab2:
     image = st.file_uploader("Dog Photo: ", type=["jpg", "png", "jpeg"], key=1)
 
     if image != None:
-        with open(os.path.join("savedimage/001.dog", "dog.png"), "wb") as f:
+        with open(os.path.join("savedimage/dog", "dog.png"), "wb") as f:
             f.write((image).getbuffer())
         with st.spinner("Loading image..."):
             time.sleep(0.2)
@@ -105,6 +107,19 @@ with tab2:
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    prediction = send_client_request(sc, image)
-                    result = prediction.response["strData"]
+                    # prediction = send_client_request(sc, image)
+                    # result = prediction.response["strData"]
+                    url = "http://tfserve:8501/v1/models/dog_model:predict"
+                    data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
+                    headers = {"Content-Type": "application/json"}
+                    response = requests.post(url, data=data, headers=headers)
+                    prediction = json.loads(response.text)["predictions"]
+                    pred = tf.argmax(prediction, axis=1)
+                    with open("/models/labels.pickle", "rb") as handle:
+                        idx_to_class1 = pickle.load(handle)
+
+                    idx_to_class = {value: key for key, value in idx_to_class1.items()}
+                    label = idx_to_class[pred.numpy()[0]]
+                    result=label.split(".")[-1].replace("_", " ")
+
                     st.warning(f"The dog in the photo is: **{result}** :sunglasses:")

@@ -4,8 +4,7 @@
 ### *Prerequisites:*
 - **Python 3.8.13**
 - **Docker and Docker Compose**
-- **k3d Cluster**
-- **ZenML**
+
 
 
 ### *How to run the project with docker:*
@@ -23,4 +22,27 @@ pip install -r requirements.txt
 docker compose up --build
 ```
 
-<!-- # Model link -> https://drive.google.com/file/d/14vhLCEYqkYKIQJ3buY-bKJhjiUtGPJhX/view?usp=sharing -->
+### *Prerequisites:*
+- **Python 3.8.13**
+- **Docker**
+- **Helm**
+- **Helmfile**
+- **Minikube**
+
+1. Start by cloning the repository.
+```bash
+git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
+```
+2. Open the project directory in terminal and type:
+```bash
+make all
+```
+3. Run the following command
+```bash
+python kubeflow_pipeline.py
+```
+4. Run the following command
+```bash
+make helm
+```
+
