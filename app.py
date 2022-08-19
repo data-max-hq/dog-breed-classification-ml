@@ -114,13 +114,18 @@ with tab2:
                 with st.spinner("Predicting the breed..."):
                     # prediction = send_client_request(sc, image)
                     # result = prediction.response["strData"]
+                    
+                    
+                    
                     url = "http://tfserve:8501/v1/models/dog_model:predict"
                     data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
                     headers = {"Content-Type": "application/json"}
                     response = requests.post(url, data=data, headers=headers)
                     prediction = json.loads(response.text)["predictions"]
                     pred = tf.argmax(prediction, axis=1)
-                    with open("/models/labels.pickle", "rb") as handle:
+                    
+                    
+                    with open("./models/labels.pickle", "rb") as handle:
                         idx_to_class1 = pickle.load(handle)
 
                     idx_to_class = {value: key for key, value in idx_to_class1.items()}
