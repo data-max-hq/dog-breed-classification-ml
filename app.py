@@ -1,10 +1,14 @@
+import json
+import requests
+from wsgiref import headers
 import streamlit as st
 import streamlit.components.v1 as components
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
-from seldon_core.seldon_client import SeldonClient
+
+# from seldon_core.seldon_client import SeldonClient
 import logging
 import json
 import requests
@@ -15,21 +19,21 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def send_client_request(seldon_client, image):
-    client_prediction = seldon_client.predict(
-        data=image,
-        deployment_name="seldon-dogbreed",
-        payload_type="ndarray",
-    )
-    return client_prediction
+# def send_client_request(seldon_client, image):
+#     client_prediction = seldon_client.predict(
+#         data=image,
+#         deployment_name="seldon-dogbreed",
+#         payload_type="ndarray",
+#     )
+#     return client_prediction
 
 
-sc = SeldonClient(
-    gateway="seldon",
-    transport="rest",
-    gateway_endpoint="seldon:9000",
-    microservice_endpoint="seldon:9000",
-)
+# sc = SeldonClient(
+#     gateway="seldon",
+#     transport="rest",
+#     gateway_endpoint="seldon:9000",
+#     microservice_endpoint="seldon:9000",
+# )
 
 # Function that transforms the image in the required format for the model
 def get_test_generator():
@@ -101,6 +105,7 @@ with tab2:
             test_generator = get_test_generator()
             image = test_generator.next()[0][0]
             image = image[None, ...]
+
             if not is_dog(image):
                 with st.spinner("Checking if the image contains a dog..."):
                     time.sleep(0.5)

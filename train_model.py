@@ -114,3 +114,23 @@ if __name__ == "__main__":
     # print(label.split(".")[-1].replace("_", " "))
 
 
+
+    # test_generator = get_train_generator()
+    # image = test_generator.next()[0][0]
+    # image = image[None, ...]
+
+    # url = "http://localhost:8501/v1/models/dog_model:predict"
+    # data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
+    # headers = {"Content-Type": "application/json"}
+    # response = requests.post(url, data=data, headers=headers)
+    # prediction = json.loads(response.text)["predictions"]
+    # pred = tf.argmax(prediction, axis=1)
+    # with open("./models/labels.pickle", "rb") as handle:
+    #     idx_to_class1 = pickle.load(handle)
+
+    # idx_to_class = {value: key for key, value in idx_to_class1.items()}
+    # label = idx_to_class[pred.numpy()[0]]
+
+    # print(label.split(".")[-1].replace("_", " "))
+
+

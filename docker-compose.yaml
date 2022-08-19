@@ -19,9 +19,6 @@ services:
       - 8502:8502
     volumes:
       - ./models:/app
-    environment:
-      - SELDON
-      - TFSERVE
   seldon:
     build: 
       context: .
@@ -30,4 +27,8 @@ services:
       - "9000:9000"
     depends_on: 
       - streamlit
-   
+ 
+    
+#  environment:
+#       - SELDON
+#       - TFSERVE
