@@ -130,4 +130,9 @@ dmypy.json
 /.idea/
 .vscode/
 models/
-
+.mlruns
+.dogImages
+.custom_classifier_logs
+mlruns/
+dogImages/
+custom_classifier_logs/
