@@ -8,7 +8,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
 
-# from seldon_core.seldon_client import SeldonClient
+from seldon_core.seldon_client import SeldonClient
 import logging
 import json
 import requests
@@ -19,21 +19,24 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-# def send_client_request(seldon_client, image):
-#     client_prediction = seldon_client.predict(
-#         data=image,
-#         deployment_name="seldon-dogbreed",
-#         payload_type="ndarray",
-#     )
-#     return client_prediction
+config = os.getenv("CONFIG", "SELDON")
 
 
-# sc = SeldonClient(
-#     gateway="seldon",
-#     transport="rest",
-#     gateway_endpoint="seldon:9000",
-#     microservice_endpoint="seldon:9000",
-# )
+def send_client_request(seldon_client, image):
+    client_prediction = seldon_client.predict(
+        data=image,
+        deployment_name="seldon-dogbreed",
+        payload_type="ndarray",
+    )
+    return client_prediction
+
+
+sc = SeldonClient(
+    gateway="seldon",
+    transport="rest",
+    gateway_endpoint="seldon:9000",
+    microservice_endpoint="seldon:9000",
+)
 
 # Function that transforms the image in the required format for the model
 def get_test_generator():
@@ -112,24 +115,29 @@ with tab2:
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    # prediction = send_client_request(sc, image)
-                    # result = prediction.response["strData"]
                     
-                    
-                    
-                    url = "http://tfserve:8501/v1/models/dog_model:predict"
-                    data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
-                    headers = {"Content-Type": "application/json"}
-                    response = requests.post(url, data=data, headers=headers)
-                    prediction = json.loads(response.text)["predictions"]
-                    pred = tf.argmax(prediction, axis=1)
-                    
-                    
-                    with open("./models/labels.pickle", "rb") as handle:
-                        idx_to_class1 = pickle.load(handle)
+                    if config=="SELDON":
+                        prediction = send_client_request(sc, image)
+                        result = prediction.response["strData"]
 
-                    idx_to_class = {value: key for key, value in idx_to_class1.items()}
-                    label = idx_to_class[pred.numpy()[0]]
-                    result=label.split(".")[-1].replace("_", " ")
+                        st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+                    
+                    elif config=="TENSORFLOW":                
+                        url = "http://tfserve:8501/v1/models/dog_model:predict"
+                        data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
+                        headers = {"Content-Type": "application/json"}
+                        response = requests.post(url, data=data, headers=headers)
+                        prediction = json.loads(response.text)["predictions"]
+                        pred = tf.argmax(prediction, axis=1)
+                        
+                    
+                        with open("./models/labels.pickle", "rb") as handle:
+                            idx_to_class1 = pickle.load(handle)
 
-                    st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+                        idx_to_class = {value: key for key, value in idx_to_class1.items()}
+                        label = idx_to_class[pred.numpy()[0]]
+                        result=label.split(".")[-1].replace("_", " ")
+
+                        st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+                    else:
+                         st.warning("No Serving")

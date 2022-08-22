@@ -16,12 +16,14 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile.streamlit
+      args:
+        CONFIG: TENSORFLOW
     image: streamlit:minikube
     ports:
       - 8502:8502
     volumes:
       - ./models:/app/models
-  
+
   seldon:
     build: 
       context: .

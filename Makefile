@@ -1,7 +1,7 @@
 all: build start load install-kubeflow 
 
 start:
-	minikube start --driver=docker --kubernetes-version=v1.21.6 --cpu 4
+	minikube start --driver=docker --kubernetes-version=v1.21.6 
 
 install-kubeflow:
 	export PIPELINE_VERSION=1.8.2
@@ -36,4 +36,3 @@ build:
 
 helm:
 	helmfile sync
-
