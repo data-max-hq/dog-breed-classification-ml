@@ -40,7 +40,7 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     docker compose down
     ```
 
-### Run project with Kubernetes
+## Run project with Kubernetes:
 ### *Prerequisites:*
 - **Docker**
 - **Helm**
