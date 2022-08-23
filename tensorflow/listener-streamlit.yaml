@@ -1,0 +1,12 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Listener
+metadata:
+  name: emissary-ingress-listener-8501
+  namespace: emissary
+spec:
+  port: 8502
+  protocol: HTTP
+  securityModel: XFP
+  hostBinding:
+    namespace:
+      from: ALL

@@ -1,0 +1,31 @@
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  labels:
+    app: seldon
+  name: dogbreed
+  namespace: seldon
+spec:
+  name: dogbreed
+  predictors:
+    - name: dogbreed
+      replicas: 1
+      componentSpecs:
+        - spec:
+            containers:
+              - image: dogbreed:minikube
+                imagePullPolicy: IfNotPresent
+                name: dogbreed
+                volumeMounts:
+                  - name: models
+                    mountPath: /models
+            volumes:
+              - name: models
+                hostPath:
+                  path: /mnt
+      graph:
+        children: []
+        endpoint:
+          type: REST
+        name: dogbreed
+        type: MODEL

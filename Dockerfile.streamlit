@@ -7,6 +7,9 @@ WORKDIR /app
 ARG  CONFIG
 ENV CONFIG ${CONFIG}
 
+ARG ENV
+ENV ENV ${ENV}
+
 COPY requirements-streamlit.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
