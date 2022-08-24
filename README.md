@@ -57,7 +57,7 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
         ```bash
         make build-tfserve
         ```
-    2. Load images to minikube
+    2. Load images to minikube:
         ```bash
         make load-tfserve
         ```
@@ -66,46 +66,44 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
         ```bash
         make build-seldon
         ```
-    2. Load images to minikube
+    2. Load images to minikube:
         ```bash
         make load-seldon
         ```
-3. Install kubeflow:
+3. Install kubeflow
     ```bash
     make install-kubeflow
     #Wait till all pods of kubeflow are running
     ```
-4. Train model:
+4. Train model
     ```bash
     make run
     ```
-5. Use the following command to set up port forwarding for the pipeline dashboard:
+5. Use the following command to set up port forwarding for the pipeline dashboard
     ```bash
     make port-kubeflow
     ```
-6. Access kubeflow dashboard at:
-    ```bash
-    http://localhost:8080/
-    ```
+6. Access kubeflow dashboard at http://localhost:8080.
+
 7. Continue deployment using:
 - TensorFlow Serving
     1. Install emissary ingress:
         ```bash
         make install-emissary
         ```
-    2. Deploying Tensorflow Serving, Streamlit. Also creating two listeners and a mapping, respectively for tfserving, streamlit and emissary
+    2. Deploying Tensorflow Serving, Streamlit. Also creating two listeners and a mapping, respectively for tfserving, streamlit and emissary:
         ```bash
-        make tfserve-deploy
+        make tf-deploy
         ```
 - Seldon Serving
-    1. Deploy seldon service:
-        ```bash
-        kubectl apply -f ./seldon
-        ```
-    2. Deploy Seldon-Core, Ambassador and Streamlit:
+    1. Deploy Seldon-Core, Ambassador and Streamlit:
         ```bash
         make helm
-        #Wait till pods are running
+        #Wait till all pods are running
+        ```
+    2. Deploy seldon service:
+        ```bash
+        make seldon-deploy
         ```
 
 8. Open streamlit UI at http://localhost:8502. Enjoy predicting 🪄
@@ -114,5 +112,4 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     ```bash
     make delete
     ```
-
 
