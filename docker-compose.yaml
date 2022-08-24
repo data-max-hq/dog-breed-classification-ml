@@ -1,19 +1,51 @@
 version: "3.9"
 
 services:
-  seldon:
-    build: 
-      context: .
-      dockerfile: Dockerfile.seldon
+  tfserve:
+    image: tensorflow/serving
     ports: 
-      - "9000:9000"
+      - 8501:8501
+    environment:
+      MODEL_NAME: dog_model
+    volumes:
+      - ./models/dog_model:/models/dog_model
     depends_on: 
-      - streamlit
-  streamlit:
+      - streamlit-tfserve
+  
+  streamlit-tfserve:
     build: 
       context: .
       dockerfile: Dockerfile.streamlit
+      args:
+        CONFIG: TENSORFLOW
+        ENV: COMPOSE
+    image: streamlit:minikube
     ports:
-      - "8501:8501"
+      - 8502:8502
+    volumes:
+      - ./models:/app/models
     
+  streamlit-seldon:
+    build: 
+      context: .
+      dockerfile: Dockerfile.streamlit
+      args:
+        CONFIG: SELDON
+        ENV: COMPOSE
+    image: streamlit:minikube
+    ports:
+      - 8502:8502
+    volumes:
+      - ./models:/app/models
+
+  seldon:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "9000:9000"
+    depends_on: 
+      - streamlit-seldon
+    volumes:
+      - ./models:/models
     

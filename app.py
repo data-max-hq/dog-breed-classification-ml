@@ -1,16 +1,26 @@
+import json
+import requests
+from wsgiref import headers
 import streamlit as st
 import streamlit.components.v1 as components
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import time
+
 from seldon_core.seldon_client import SeldonClient
 import logging
-
+import json
+import requests
+import pickle
 
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+config = os.getenv("CONFIG", "SELDON")
+env=os.getenv("ENV" , "KUBERNETES")
 
 
 def send_client_request(seldon_client, image):
@@ -21,13 +31,20 @@ def send_client_request(seldon_client, image):
     )
     return client_prediction
 
-
-sc = SeldonClient(
-    gateway="seldon",
-    transport="rest",
-    gateway_endpoint="seldon:9000",
-    microservice_endpoint="seldon:9000",
-)
+if env=="COMPOSE":
+    sc = SeldonClient(
+        gateway="seldon",
+        transport="rest",
+        gateway_endpoint="seldon:9000",
+        microservice_endpoint="seldon:9000",
+    )
+elif env=="KUBERNETES":
+    sc = SeldonClient(
+        gateway="ambassador",
+        transport="rest",
+        gateway_endpoint="ambassador.ambassador.svc",
+        namespace="seldon",
+    )
 
 # Function that transforms the image in the required format for the model
 def get_test_generator():
@@ -88,7 +105,7 @@ with tab2:
     image = st.file_uploader("Dog Photo: ", type=["jpg", "png", "jpeg"], key=1)
 
     if image != None:
-        with open(os.path.join("savedimage/001.dog", "dog.png"), "wb") as f:
+        with open(os.path.join("savedimage/dog", "dog.png"), "wb") as f:
             f.write((image).getbuffer())
         with st.spinner("Loading image..."):
             time.sleep(0.2)
@@ -99,12 +116,35 @@ with tab2:
             test_generator = get_test_generator()
             image = test_generator.next()[0][0]
             image = image[None, ...]
+
             if not is_dog(image):
                 with st.spinner("Checking if the image contains a dog..."):
                     time.sleep(0.5)
                     st.error("Please enter a dog photo!")
             else:
                 with st.spinner("Predicting the breed..."):
-                    prediction = send_client_request(sc, image)
-                    result = prediction.response["strData"]
+                    if config=="SELDON":
+                        prediction = send_client_request(sc, image)
+                        response = prediction.response.get("data").get("ndarray")
+                        pred = tf.argmax(response, axis=1)
+
+                    elif config=="TENSORFLOW":
+                        if env== "COMPOSE":
+                            url = "http://tfserve:8501/v1/models/dog_model:predict"
+                        elif env=="KUBERNETES":
+                            url = "http://emissary-ingress.emissary.svc.cluster.local/v1/models/model:predict"
+                        data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
+                        headers = {"Content-Type": "application/json"}
+                        response = requests.post(url, data=data, headers=headers)
+                        prediction = json.loads(response.text)["predictions"]
+                        pred = tf.argmax(prediction, axis=1)
+                   
+                    with open("./models/labels.pickle", "rb") as handle:
+                            idx_to_class1 = pickle.load(handle)
+
+                    idx_to_class = {value: key for key, value in idx_to_class1.items()}
+                    label = idx_to_class[pred.numpy()[0]]
+                    result=label.split(".")[-1].replace("_", " ")
+
                     st.warning(f"The dog in the photo is: **{result}** :sunglasses:")
+                   

@@ -57,7 +57,9 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
         ```bash
         make build-tfserve
         ```
+
     2. Load images to minikube:
+
         ```bash
         make load-tfserve
         ```
@@ -84,7 +86,6 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     make port-kubeflow
     ```
 6. Access kubeflow dashboard at http://localhost:8080.
-
 7. Continue deployment using:
 - TensorFlow Serving
     1. Install emissary ingress:

@@ -3,25 +3,25 @@ kind: Deployment
 metadata:
   labels:
     app: streamlit
-  name: {{ .Release.Name }}
+  name: streamlit
   namespace: app
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: streamlit
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: streamlit
     spec:
       containers:
-        - name: {{ .Release.Name }}
-          image: {{ .Values.app.image }}:{{ .Values.app.tag }}
+        - name: streamlit
+          image: streamlit:minikube
           imagePullPolicy: IfNotPresent
           env:
             - name: CONFIG
-              value: "SELDON"
+              value: "TENSORFLOW"
             - name: ENV
               value: "KUBERNETES"
           ports:
@@ -30,21 +30,25 @@ spec:
           volumeMounts:
             - name: labels
               mountPath: /app/models
-      volumes:
+      volumes: 
         - name: labels
           hostPath:
             path: /mnt
+
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}
+  name: streamlit-service
   namespace: app
 spec:
   selector:
-    app: {{ .Release.Name }}
+    app: streamlit
   ports:
     - name: http
       port: 8502
       targetPort: streamlit-svc
+
+
+    

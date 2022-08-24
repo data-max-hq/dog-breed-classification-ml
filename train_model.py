@@ -5,8 +5,7 @@ import pickle
 import os
 import mlflow
 import logging
-
-
+import pickle
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 logging.basicConfig()
@@ -17,6 +16,8 @@ BATCH_SIZE = 32
 NUMBER_OF_NODES = 256
 EPOCHS = 1
 IMG_SIZE = 224
+
+config = os.getenv("CONFIG", "LOCAL")
 
 
 def get_train_generator():
@@ -75,20 +76,28 @@ def train():
         train_generator, epochs=int(EPOCHS), validation_data=valid_generator
     )
 
+    labels = train_generator.class_indices
+    
     logging.info("Dump models.")
-    resnet_model.save("/models/dog_model.h5")
+
+    if config=="LOCAL":
+        resnet_model.save("./models/dog_model/1")
+        with open("./models/labels.pickle", "wb") as handle:
+            pickle.dump(labels, handle)
+    elif config=="KUBERNETES":
+        
+        resnet_model.save("/models/dog_model/1")
+        with open("/models/labels.pickle", "wb") as handle:
+            pickle.dump(labels, handle)
 
     logging.info("Finished training.")
 
-    labels = train_generator.class_indices
-    with open("/models/labels.pickle", "wb") as handle:
-        pickle.dump(labels, handle)
-
-
 if __name__ == "__main__":
+   
     os.system(
         "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
     )
     os.system("unzip -qo dogImages.zip")
     os.system("rm dogImages.zip")
     train()
+  

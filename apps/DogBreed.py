@@ -10,15 +10,13 @@ logger.setLevel(logging.INFO)
 class DogBreed(object):
     """Class DogBreed"""
 
-    def __init__(self, models_dir="/models"):
+    def __init__(self, models_dir="/models/dog_model/1"):
         self.loaded = False
         logging.info("load model here...")
         self._models_dir = models_dir
 
     def load(self):
-        self._dog_model = tf.keras.models.load_model(f"{self._models_dir}/dog_model.h5")
-        with open(f"{self._models_dir}/labels.pickle", "rb") as handle:
-            self._idx_to_class = pickle.load(handle)
+        self._dog_model = tf.keras.models.load_model(f"{self._models_dir}")
         self.loaded = True
         logging.info("model has been loaded and initialized...")
 
@@ -28,14 +26,5 @@ class DogBreed(object):
             logging.info("Not loaded yet.")
             self.load()
         logging.info("Model loaded.")
-        logging.info(X)
-        logging.info("Got request.")
         probs = self._dog_model.predict(X)
-        logging.info(f"probs: {probs}")
-        pred = tf.argmax(probs, axis=1)
-        logging.info(pred)
-        idx_to_class = {value: key for key, value in self._idx_to_class.items()}
-        logging.info(idx_to_class)
-        label = idx_to_class[pred.numpy()[0]]
-        logging.info("Return prediction.")
-        return label.split(".")[-1].replace("_", " ")
+        return probs
