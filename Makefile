@@ -1,4 +1,5 @@
-all: build start load install-kubeflow 
+all-seldon: build-seldon start load-seldon install-kubeflow 
+all-tfserve: build-tfserve start load-tfserve install-kubeflow 
 
 start:
 	minikube start --driver=docker --kubernetes-version=v1.21.6 
@@ -16,7 +17,12 @@ port-admin:
 	kubectl port-forward svc/ambassador-admin -n ambassador 8877:8877
 
 
+seldon-deploy:
+	kubectl create ns seldon
+	kubectl apply -f ./seldon
+
 tf-deploy:
+	kubectl create ns app
 	kubectl apply -f ./tensorflow
 
 delete:
@@ -25,19 +31,22 @@ delete:
 port-kubeflow:
 	kubectl port-forward svc/ml-pipeline-ui -n kubeflow 8081:80
 
+port-streamlit:
+	kubectl port-forward svc/streamlit - -n app 8082:8082
 
 install-emissary:
+	# Add the Repo:
 	helm repo add datawire https://app.getambassador.io
 	helm repo update
+	# Create Namespace and Install:
 	kubectl create namespace emissary && \
 	kubectl apply -f https://app.getambassador.io/yaml/emissary/3.1.0/emissary-crds.yaml
 	kubectl wait --timeout=90s --for=condition=available deployment emissary-apiext -n emissary-system
-	helm install emissary-ingress --namespace emissary datawire/emissary-ingress && \
+	helm install emissary-ingress --namespace emissary datawire/emissary-ingress --values=./charts/emissary/values.yaml && \
 	kubectl -n emissary wait --for condition=available --timeout=90s deploy -lapp.kubernetes.io/instance=emissary-ingress
 
 
 build-tfserve:
-	docker pull tensorflow/serving
 	docker tag tensorflow/serving tfserve:minikube
 	docker build -t trainmodel:minikube --build-arg CONFIG="KUBERNETES" --file Dockerfile.train .
 	docker build -t streamlit:minikube --build-arg CONFIG="TENSORFLOW" --file Dockerfile.streamlit .
@@ -72,3 +81,6 @@ local-train:
 
 run:
 	python3 kubeflow_pipeline.py
+
+mount:
+	minikube start --driver=docker --kubernetes-version=v1.21.6 --mount-string="/home/endri/Documents/dog-breed-classification-ml/models:/mnt" --mount

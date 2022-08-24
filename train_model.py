@@ -100,7 +100,4 @@ if __name__ == "__main__":
     os.system("unzip -qo dogImages.zip")
     os.system("rm dogImages.zip")
     train()
-    
   
-
-

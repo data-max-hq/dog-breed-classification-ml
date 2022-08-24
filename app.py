@@ -132,8 +132,7 @@ with tab2:
                         if env== "COMPOSE":
                             url = "http://tfserve:8501/v1/models/dog_model:predict"
                         elif env=="KUBERNETES":
-                            url = "http://emissary-ingress.emissary.svc/v1/models/dog_model:predict"
-
+                            url = "http://emissary-ingress.emissary.svc.cluster.local/v1/models/model:predict"
                         data = json.dumps({"signature_name":"serving_default", "instances":image.tolist()})
                         headers = {"Content-Type": "application/json"}
                         response = requests.post(url, data=data, headers=headers)

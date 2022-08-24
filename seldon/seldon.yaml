@@ -3,19 +3,24 @@ kind: SeldonDeployment
 metadata:
   labels:
     app: seldon
-  name: dogbreed
+  name: seldon-dogbreed
   namespace: seldon
 spec:
-  name: dogbreed
+  name: seldon-dogbreed
   predictors:
-    - name: dogbreed
+    - name: seldon-dogbreed
       replicas: 1
       componentSpecs:
         - spec:
             containers:
               - image: dogbreed:minikube
                 imagePullPolicy: IfNotPresent
-                name: dogbreed
+                name: seldon-dogbreed
+                env:
+                  - name: CONFIG
+                    value: "SELDON"
+                  - name: ENV
+                    value: "KUBERNETES"
                 volumeMounts:
                   - name: models
                     mountPath: /models
@@ -27,5 +32,5 @@ spec:
         children: []
         endpoint:
           type: REST
-        name: dogbreed
+        name: seldon-dogbreed
         type: MODEL
