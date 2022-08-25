@@ -6,6 +6,7 @@ import os
 import mlflow
 import logging
 import pickle
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 logging.basicConfig()
@@ -77,27 +78,27 @@ def train():
     )
 
     labels = train_generator.class_indices
-    
+
     logging.info("Dump models.")
 
-    if config=="LOCAL":
+    if config == "LOCAL":
         resnet_model.save("./models/dog_model/1")
         with open("./models/labels.pickle", "wb") as handle:
             pickle.dump(labels, handle)
-    elif config=="KUBERNETES":
-        
+    elif config == "KUBERNETES":
+
         resnet_model.save("/models/dog_model/1")
         with open("/models/labels.pickle", "wb") as handle:
             pickle.dump(labels, handle)
 
     logging.info("Finished training.")
 
+
 if __name__ == "__main__":
-   
+
     os.system(
         "wget https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip"
     )
     os.system("unzip -qo dogImages.zip")
     os.system("rm dogImages.zip")
     train()
-  

@@ -3,17 +3,17 @@ version: "3.9"
 services:
   tfserve:
     image: tensorflow/serving
-    ports: 
+    ports:
       - 8501:8501
     environment:
       MODEL_NAME: dog_model
     volumes:
       - ./models/dog_model:/models/dog_model
-    depends_on: 
+    depends_on:
       - streamlit-tfserve
-  
+
   streamlit-tfserve:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.streamlit
       args:
@@ -24,9 +24,9 @@ services:
       - 8502:8502
     volumes:
       - ./models:/app/models
-    
+
   streamlit-seldon:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.streamlit
       args:
@@ -39,13 +39,12 @@ services:
       - ./models:/app/models
 
   seldon:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
-    ports: 
+    ports:
       - "9000:9000"
-    depends_on: 
+    depends_on:
       - streamlit-seldon
     volumes:
       - ./models:/models
-    
