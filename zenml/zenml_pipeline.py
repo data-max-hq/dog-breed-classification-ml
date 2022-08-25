@@ -10,14 +10,12 @@ from zenml.integrations.seldon.services.seldon_deployment import (
 from zenml.artifacts import ModelArtifact
 from zenml.io import fileio
 from zenml.materializers.base_materializer import BaseMaterializer
-
+from typing import Type, cast
 from PIL import ImageFile
 import tensorflow as tf
 import os, logging
 import numpy as np
-
-# import mlflow
-from typing import Type, cast
+import mlflow
 
 
 class ModelMaterializer(BaseMaterializer):
@@ -100,7 +98,7 @@ def train(config: TensorflowTrainerConfig) -> tf.keras.Model:
         batch_size=int(BATCH_SIZE),
     )
 
-    # mlflow.tensorflow.autolog()
+    mlflow.tensorflow.autolog()
 
     t_generator = train_generator()
     resnet_model.fit(t_generator, epochs=int(EPOCHS), validation_data=valid_generator)
@@ -116,6 +114,7 @@ def save_labels() -> dict:
     return labels
 
 
+# Temporary data importer
 @step
 def dynamic_data_importer() -> Output(data=np.ndarray):
     return np.array([[1, 2, 3], [4, 5, 6]], np.int32)
