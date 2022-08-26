@@ -88,8 +88,6 @@ with tab1:
     st.write("## *Prerequisites:*")
     st.write("- **Python 3.8.13**")
     st.write("- **Docker and Docker Compose**")
-    st.write("- **k3d Cluster**")
-    st.write("- **ZenML**")
     st.write("## *How to run the project with docker:*")
     st.write("1. Start by cloning the repository.", "bash")
     st.code("git clone https://github.com/data-max-hq/dog-breed-classification-ml.git")

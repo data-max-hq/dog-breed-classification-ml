@@ -36,7 +36,6 @@ spec:
             path: /mnt
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

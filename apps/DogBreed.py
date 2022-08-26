@@ -1,6 +1,5 @@
 import logging
 import tensorflow as tf
-import pickle
 
 logging.basicConfig()
 logger = logging.getLogger()
@@ -12,13 +11,13 @@ class DogBreed(object):
 
     def __init__(self, models_dir="/models/dog_model/1"):
         self.loaded = False
-        logging.info("load model here...")
+        logging.info("Load model here...")
         self._models_dir = models_dir
 
     def load(self):
         self._dog_model = tf.keras.models.load_model(f"{self._models_dir}")
         self.loaded = True
-        logging.info("model has been loaded and initialized...")
+        logging.info("Model has been loaded and initialized...")
 
     def predict(self, X, feature_names=None):
         """Predict Method"""

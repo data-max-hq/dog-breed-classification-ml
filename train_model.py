@@ -3,7 +3,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from PIL import ImageFile
 import pickle
 import os
-import mlflow
 import logging
 import pickle
 
@@ -71,7 +70,7 @@ def train():
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
 
-    mlflow.tensorflow.autolog()
+  
 
     resnet_model.fit(
         train_generator, epochs=int(EPOCHS), validation_data=valid_generator

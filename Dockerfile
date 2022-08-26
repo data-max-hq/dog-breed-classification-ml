@@ -1,11 +1,9 @@
 FROM python:3.8
 
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive && apt-get install -y \
-   curl \
-   python3-setuptools && \
-apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y curl python3-setuptools && \
+    apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /models
 
@@ -14,7 +12,6 @@ WORKDIR /app
 COPY requirements.txt requirements.txt 
 RUN pip3 install -r requirements.txt 
 
-# Seldon Core specific
 COPY /apps .
 
 ENV MODEL_NAME DogBreed
