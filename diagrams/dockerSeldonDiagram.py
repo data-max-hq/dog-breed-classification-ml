@@ -7,11 +7,10 @@ from diagrams.onprem.client import User, Client
 from diagrams.k8s.ecosystem import Helm
 
 with Diagram(
-    name="Local w/o K8s",
+    name="Local w/o K8s & seldon-core",
     filename="output/seldondiagram",
     direction="TB",
     outformat=["pdf", "png"],
-    show=False,
     curvestyle="ortho",
 ):
 
@@ -46,4 +45,4 @@ with Diagram(
         >> Edge(color="orange", style="bold")
         >> seldon
     )
-    user >> Edge(color="green") >> st >> Edge(color="red") >> output
+    user >> Edge(color="#0F6B2A", style="bold") >> st >> Edge(color="red", style="bold") >> output
