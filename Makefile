@@ -71,10 +71,10 @@ helm:
 	helmfile sync
 
 compose-seldon:
-	docker compose up --build streamlit-seldon seldon
+	docker compose -f docker-compose-seldon.yaml up --build
 
 compose-tfserve:
-	docker compose up --build streamlit-tfserve tfserve
+	docker compose -f docker-compose-tfserve.yaml up --build
 
 local-train:
 	python3 train_model.py
