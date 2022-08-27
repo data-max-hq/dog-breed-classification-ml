@@ -8,7 +8,7 @@ from diagrams.k8s.ecosystem import Helm
 from diagrams.onprem.network import Ambassador
 
 
-with Diagram("kubernetes", "output/k8sTFdiagram", "TB", "ortho", ["pdf", "png"]):
+with Diagram("kubernetes with TFserve", "output/k8sTFdiagram", "TB", "ortho", ["pdf", "png"]):
 
     user = User("user")
     ui = Client("Streamlit UI")
@@ -30,11 +30,11 @@ with Diagram("kubernetes", "output/k8sTFdiagram", "TB", "ortho", ["pdf", "png"])
             ambassador = Ambassador("Ambassador")
     source >> Edge(color="#FF000000") >> model
     user >> Edge(color="#FF000000") >> model
-    kubeflow >> Edge(color="Black") >> output
-    ambassador >> Edge(color="Black") >> st
-    ambassador >> Edge(color="Black") >> seldon
-    st >> Edge(color="Red") >>  ambassador
-    model >> Edge(color="#5F1E00") >> st
-    model >> Edge(color="#5F1E00") >> seldon
-    seldon >> Edge(color="#F8BF3C") >>  ambassador
-    user >> Edge(color="Black") >> ui >> Edge(color = "Blue") >> st >> Edge(color ="#0F6B2A") >> ui
+    kubeflow >> Edge(color="Black", style="bold") >> output
+    ambassador >> Edge(color="Black", style="bold") >> st
+    ambassador >> Edge(color="Black", style="bold") >> seldon
+    st >> Edge(color="Red", style="bold") >>  ambassador
+    model >> Edge(color="#5F1E00", style="bold") >> st
+    model >> Edge(color="#5F1E00", style="bold") >> seldon
+    seldon >> Edge(color="#F8BF3C", style="bold") >>  ambassador
+    user >> Edge(color="Black", style="bold") >> ui >> Edge(color = "Blue", style="bold") >> st >> Edge(color ="#0F6B2A", style="bold") >> ui
