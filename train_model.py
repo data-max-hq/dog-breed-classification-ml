@@ -70,8 +70,6 @@ def train():
     train_generator = get_train_generator()
     valid_generator = get_valid_generator()
 
-  
-
     resnet_model.fit(
         train_generator, epochs=int(EPOCHS), validation_data=valid_generator
     )

@@ -16,11 +16,11 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
 - **Docker Compose**
 
 
-1. Open the project directory in terminal and type:
+1. Open the project directory in terminal and type
     ```bash
     make requirements
     ```
-2. Train the model (only once):
+2. Train the model (only once)
     ```bash
     make local-train
     ```
@@ -33,9 +33,9 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     ```bash
     make compose-seldon
     ```
-4. Open streamlit UI at http://localhost:8502. Enjoy predicting 🪄
+4. Open Streamlit UI at http://localhost:8502. Enjoy predicting 🪄
 
-5. Stop docker containers:
+5. Stop docker containers
     ```bash
     docker compose down
     ```
@@ -53,26 +53,26 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     ```
 2. Deploy model using:
 - TensorFlow Serving
-    1. Build images:
+    1. Build images
         ```bash
         make build-tfserve
         ```
 
-    2. Load images to minikube:
+    2. Load images to minikube
 
         ```bash
         make load-tfserve
         ```
 - Seldon Serving
-    1. Build images:
+    1. Build images
         ```bash
         make build-seldon
         ```
-    2. Load images to minikube:
+    2. Load images to minikube
         ```bash
         make load-seldon
         ```
-3. Install kubeflow
+3. Install Kubeflow
     ```bash
     make install-kubeflow
     #Wait till all pods of kubeflow are running
@@ -85,32 +85,31 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     ```bash
     make port-kubeflow
     ```
-6. Access kubeflow dashboard at http://localhost:8080.
+6. Access Kubeflow dashboard at http://localhost:8080.
 7. Continue deployment using:
 - TensorFlow Serving
-    1. Install emissary ingress:
+    1. Install Emissary Ingress
         ```bash
         make install-emissary
         ```
-    2. Deploying Tensorflow Serving, Streamlit. Also creating two listeners and a mapping, respectively for tfserving, streamlit and emissary:
+    2. Deploying TensorFlow Serving and Streamlit. Also creating two listeners and a mapping, for TensorFlow Serving, Streamlit and Emissary respectively
         ```bash
         make tf-deploy
         ```
 - Seldon Serving
-    1. Deploy Seldon-Core, Ambassador and Streamlit:
+    1. Deploy Seldon-Core, Ambassador and Streamlit
         ```bash
         make helm
         #Wait till all pods are running
         ```
-    2. Deploy seldon service:
+    2. Deploy Seldon service
         ```bash
         make seldon-deploy
         ```
 
-8. Open streamlit UI at http://localhost:8502. Enjoy predicting 🪄
+8. Open Streamlit UI at http://localhost:8502. Enjoy predicting 🪄
 
 9. Delete cluster
     ```bash
     make delete
     ```
-

@@ -1,10 +1,7 @@
 from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
-from diagrams.onprem.container import Docker
-from diagrams.onprem.network import Ambassador, Internet
-from diagrams.onprem.workflow import KubeFlow
+from diagrams.onprem.network import Internet
 from diagrams.onprem.client import User, Client
-from diagrams.k8s.ecosystem import Helm
 
 with Diagram(
     name="Local w/o K8s & seldon-core",
@@ -45,4 +42,10 @@ with Diagram(
         >> Edge(color="orange", style="bold")
         >> seldon
     )
-    user >> Edge(color="#0F6B2A", style="bold") >> st >> Edge(color="red", style="bold") >> output
+    (
+        user
+        >> Edge(color="#0F6B2A", style="bold")
+        >> st
+        >> Edge(color="red", style="bold")
+        >> output
+    )

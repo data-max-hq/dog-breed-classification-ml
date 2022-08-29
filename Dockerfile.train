@@ -15,4 +15,3 @@ COPY ./train_model.py .
 EXPOSE 5000
 
 CMD [ "python3" , "train_model.py" ]
-
