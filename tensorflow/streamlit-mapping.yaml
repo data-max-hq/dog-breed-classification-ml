@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: streamlit-mapping
+spec:
+  hostname: "*"
+  prefix: /streamlit/
+  rewrite: /
+  use_websocket: true
+  service: streamlit.app:8502

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: streamlit
+  name: {{ .Release.Name }}
+  namespace: app
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: {{ .Values.app.image }}:{{ .Values.app.tag }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: {{ .Values.config.name }}
+              value: {{ .Values.config.value }}
+            - name: {{ .Values.env.name }}
+              value: {{ .Values.env.value }}
+          ports:
+            - name: streamlit-svc
+              containerPort: 8502
+          volumeMounts:
+            - name: {{ .Values.volumes.name }}
+              mountPath: {{ .Values.volumes.mountPath }}
+      volumes:
+        - name: {{ .Values.volumes.name }}
+          hostPath:
+            path: {{ .Values.volumes.path }}

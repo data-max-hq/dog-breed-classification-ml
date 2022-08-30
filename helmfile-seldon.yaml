@@ -24,6 +24,6 @@ releases:
   - name: streamlit
     namespace: app
     createNamespace: true
-    chart: charts/streamlit
+    chart: charts/streamlit-seldon
     values:
-      - "./charts/streamlit/values.yaml"
+      - "./charts/streamlit-seldon/values.yaml"

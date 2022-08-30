@@ -1,0 +1,8 @@
+apiVersion: v2
+name: tensorflow-serving
+description: Chart to deploy a tensorflow-serving
+version: 1.0.0
+
+keywords:
+  - kubernetes
+  - machine-learning
