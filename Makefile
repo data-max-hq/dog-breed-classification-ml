@@ -1,5 +1,5 @@
-all-seldon: build-seldon start load-seldon install-kubeflow 
-all-tfserve: build-tfserve start load-tfserve install-kubeflow 
+all-seldon: build-seldon start-seldon load-seldon install-kubeflow helm-seldon
+all-tfserve: build-tfserve start-tfserve load-tfserve install-kubeflow 
 
 start-seldon:
 	minikube start --driver=docker --kubernetes-version=v1.21.6 
@@ -12,6 +12,9 @@ install-kubeflow:
 	kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$$PIPELINE_VERSION"
 	kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
 	kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/env/platform-agnostic-pns?ref=$$PIPELINE_VERSION"
+
+port-emissary:
+	kubectl port-forward svc/emissary-ingress -n emissary 8080:80
 
 port:
 	kubectl port-forward svc/ambassador -n ambassador 8080:80
