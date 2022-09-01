@@ -7,7 +7,7 @@ from diagrams.onprem.network import Ambassador
 
 
 with Diagram(
-    name="kubernetes with seldon-core",
+    name="kubernetes with Seldon-Core",
     filename="output/k8sseldondiagram",
     direction="TB",
     outformat=["pdf", "png"],
@@ -20,18 +20,18 @@ with Diagram(
     with Cluster("minikube"):
         with Cluster("Kubeflow Pipeline", "TB"):
             kubeflow = KubeFlow()
-            with Cluster("Model training", "TB"):
+            with Cluster("  Model training", "TB"):
                 source = Internet("source")
-                tf = Custom("trainer", "../resources/tf.png")
+                tf = Custom("TensorFlow", "../resources/tf.png")
         model = Custom("model", "../resources/model.png")
         kubeflow >> Edge(color="#FF000000") >> source
         source >> Edge(color="Black") >> tf >> Edge(color="#F8BF3C") >> model
         with Cluster("    ."):
             st = Custom("Streamlit", "../resources/streamlit.png")
-        with Cluster("      Seldon-Core"):
-            seldon = Custom("model serve", "../resources/seldon.png")
+        with Cluster("    model serve"):
+            seldon = Custom("Seldon-Core", "../resources/seldon.png")
         with Cluster(""):
-            ambassador = Ambassador("Ambassador")
+            ambassador = Custom("Emissary-ingress", "../resources/emissary.png")
     source >> Edge(color="#FF000000") >> model
     user >> Edge(color="#FF000000") >> model
     kubeflow >> Edge(color="Black", style="bold") >> output

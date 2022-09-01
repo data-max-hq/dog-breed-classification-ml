@@ -4,7 +4,7 @@ from diagrams.onprem.network import Internet
 from diagrams.onprem.client import User, Client
 
 with Diagram(
-    name="Local w/o K8s & TFserve",
+    name="Docker Compose with TensorFlow Serving",
     filename="output/TFdiagram",
     direction="TB",
     outformat=["pdf", "png"],
@@ -12,17 +12,17 @@ with Diagram(
 ):
 
     user = User("user")
-    output = Client("output")
+    output = Client("Streamlit UI")
     with Cluster("       training"):
         source = Internet("source")
-        tf = Custom("trainer", "../resources/tf.png")
+        tf = Custom("TensorFlow", "../resources/tf.png")
         model = Custom("model", "../resources/model.png")
     with Cluster("                     docker compose", "TB"):
         docker = Custom("", "../resources/compose.png")
         with Cluster("    dashboard"):
-            st = Custom("UI", "../resources/streamlit.png")
+            st = Custom("Streamlit", "../resources/streamlit.png")
         with Cluster("    model server"):
-            seldon = Custom("TF serve", "../resources/tf.png")
+            seldon = Custom("TensorFlow Serving", "../resources/tf.png")
         (
             st
             >> Edge(color="red", style="dashed")
