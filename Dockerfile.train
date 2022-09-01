@@ -7,6 +7,8 @@ WORKDIR /app
 ARG  CONFIG
 ENV CONFIG ${CONFIG}
 
+RUN pip install --upgrade pip
+
 COPY requirements.txt requirements.txt 
 RUN pip install -r requirements.txt 
 

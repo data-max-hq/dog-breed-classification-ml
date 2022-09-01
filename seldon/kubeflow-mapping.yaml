@@ -1,0 +1,9 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: kubeflow-mapping
+spec:
+  prefix: /kubeflow/
+  rewrite: /
+  use_websocket: true
+  service: ml-pipeline-ui.kubeflow:80

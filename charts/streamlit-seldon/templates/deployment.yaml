@@ -20,31 +20,17 @@ spec:
           image: {{ .Values.app.image }}:{{ .Values.app.tag }}
           imagePullPolicy: IfNotPresent
           env:
-            - name: CONFIG
-              value: "SELDON"
-            - name: ENV
-              value: "KUBERNETES"
+            - name: {{ .Values.config.name }}
+              value: {{ .Values.config.value }}
+            - name: {{ .Values.env.name }}
+              value: {{ .Values.env.value }}
           ports:
             - name: streamlit-svc
               containerPort: 8502
           volumeMounts:
-            - name: labels
-              mountPath: /app/models
+            - name: {{ .Values.volumes.name }}
+              mountPath: {{ .Values.volumes.mountPath }}
       volumes:
-        - name: labels
+        - name: {{ .Values.volumes.name }}
           hostPath:
-            path: /mnt
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}
-  namespace: app
-spec:
-  selector:
-    app: {{ .Release.Name }}
-  ports:
-    - name: http
-      port: 8502
-      targetPort: streamlit-svc
+            path: {{ .Values.volumes.path }}

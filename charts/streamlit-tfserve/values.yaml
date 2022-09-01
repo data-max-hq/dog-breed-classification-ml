@@ -1,0 +1,18 @@
+replicas: 1
+
+app:
+  image: streamlit
+  tag: minikube
+
+config:
+  name: CONFIG
+  value: "TENSORFLOW"
+
+env:
+  name: ENV
+  value: "KUBERNETES"
+
+volumes:
+  name: labels
+  mountPath: /app/models
+  path: /mnt

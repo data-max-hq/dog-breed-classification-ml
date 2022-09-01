@@ -1,0 +1,13 @@
+releases:
+  - name: tfserve
+    namespace: tensorflow
+    createNamespace: true
+    chart: charts/tfserve
+    values:
+      - "./charts/tfserve/values.yaml"
+  - name: streamlit
+    namespace: app
+    createNamespace: true
+    chart: charts/streamlit-tfserve
+    values:
+      - "./charts/streamlit-tfserve/values.yaml"

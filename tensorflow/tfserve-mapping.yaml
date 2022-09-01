@@ -5,4 +5,4 @@ metadata:
 spec:
   hostname: "*"
   prefix: /
-  service: tfserve-svc.default:8501
+  service: tfserve.tensorflow:8501
