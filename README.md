@@ -1,5 +1,6 @@
 # Dog Breed Classification 🐶
 #### A demo that uses a ResNet model to predict the breed of a dog given in a photo.
+#### Link to our blog post https://www.data-max.io/post/dog-breed-classification.
 
 ## Geting Started
 **There are two ways you can run this project:**
