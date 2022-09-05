@@ -136,3 +136,4 @@ models/
 mlruns/
 dogImages/
 custom_classifier_logs/
+.DS_Store

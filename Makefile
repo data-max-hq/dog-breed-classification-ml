@@ -16,6 +16,9 @@ install-kubeflow:
 port-emissary:
 	kubectl port-forward svc/emissary-ingress -n emissary 8080:80
 
+port-kubeflow:
+	kubectl port-forward svc/ml-pipeline-ui -n kubeflow 8081:80
+
 port:
 	kubectl port-forward svc/ambassador -n ambassador 8080:80
 

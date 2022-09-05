@@ -47,69 +47,77 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
 - **Helmfile**
 - **Minikube**
 
-1. Create a kubernetes cluster (minikube)
-    ```bash
-    make start
-    ```
-2. Deploy model using:
+1. Deploy model using:
 - TensorFlow Serving
-    1. Build images
+    1. Create a kubernetes cluster (minikube)
+        ```bash
+        make start-tfserve
+        ```
+    2. Build images
         ```bash
         make build-tfserve
         ```
-
-    2. Load images to minikube
-
+    3. Load images to minikube
         ```bash
         make load-tfserve
         ```
+    4. Install Kubeflow
+        ```bash
+        make install-kubeflow
+        #Wait till all pods of kubeflow are running
+        ```
+    5. Expose Kubeflow port so you can access Kubeflow dashboard at http://localhost:8080 (optional)
+        ```bash
+        make port-kubeflow
+        ```
+    6. Deploy TensorFlow Serving, Ambassador and Streamlit
+        ```bash
+        make helm-tfserve
+        ```
+    7. Apply mapping resources
+        ```bash
+        make deploy-tfserve
+        ```
+    8. Expose Emissary-ingress port
+        ```bash
+        make port-emissary
+        ```
 - Seldon Serving
-    1. Build images
+    1. Create a kubernetes cluster (minikube)
+    ```bash
+    make start-seldon
+    ```
+    2. Build images
         ```bash
         make build-seldon
         ```
-    2. Load images to minikube
+    3. Load images to minikube
         ```bash
         make load-seldon
         ```
-3. Install Kubeflow
-    ```bash
-    make install-kubeflow
-    #Wait till all pods of kubeflow are running
-    ```
-4. Train model
-    ```bash
-    make run
-    ```
-5. Use the following command to set up port forwarding for the pipeline dashboard
-    ```bash
-    make port-kubeflow
-    ```
-6. Access Kubeflow dashboard at http://localhost:8080.
-7. Continue deployment using:
-- TensorFlow Serving
-    1. Install Emissary Ingress
+    4. Install Kubeflow
         ```bash
-        make install-emissary
+        make install-kubeflow
+        #Wait till all pods of kubeflow are running
         ```
-    2. Deploying TensorFlow Serving and Streamlit. Also creating two listeners and a mapping, for TensorFlow Serving, Streamlit and Emissary respectively
+    5. Expose Kubeflow port so you can access Kubeflow dashboard at http://localhost:8080 (optional)
         ```bash
-        make tf-deploy
+        make port-kubeflow
         ```
-- Seldon Serving
-    1. Deploy Seldon-Core, Ambassador and Streamlit
+    6. Deploy Seldon-Core, Ambassador and Streamlit
         ```bash
-        make helm
-        #Wait till all pods are running
+        make helm-seldon
         ```
-    2. Deploy Seldon service
+    7. Deploy Seldon application and apply mapping resources
         ```bash
-        make seldon-deploy
+        make deploy-seldon
         ```
-
-8. Open Streamlit UI at http://localhost:8502. Enjoy predicting 🪄
-
-9. Delete cluster
+    8. Expose Emissary-ingress port
+        ```bash
+        make port
+        ```
+2. Open Streamlit UI at http://localhost:8080/streamlit. Enjoy predicting 🪄
+3. Delete cluster
     ```bash
     make delete
     ```
