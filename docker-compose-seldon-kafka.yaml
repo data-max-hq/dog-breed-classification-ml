@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  seldon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./models:/models
