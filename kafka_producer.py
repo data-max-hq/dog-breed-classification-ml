@@ -1,7 +1,13 @@
 from kafka import KafkaProducer
-import cv2
-producer=KafkaProducer(bootstrap_servers=['localhost:9092'])
-image = cv2.imread("./dogImages/test/078.Great_dane/Great_dane_05322.jpg")
-ret, buffer = cv2.imencode('.jpg', image)
-producer.send("dogtopic",buffer.tobytes())
-producer.flush()
+import base64
+
+def image_producer():
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    with open("./dogImages/test/002.Afghan_hound/Afghan_hound_00116.jpg", "rb") as imageFile:
+        str1 = base64.b64encode(imageFile.read())
+    
+    producer.send('dogtopic', str1)
+
+
+if __name__ == "__main__":
+   image_producer()

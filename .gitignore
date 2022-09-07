@@ -137,3 +137,5 @@ mlruns/
 dogImages/
 custom_classifier_logs/
 .DS_Store
+docker-compose.yml
+foo.png
