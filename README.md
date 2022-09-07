@@ -122,3 +122,30 @@ git clone https://github.com/data-max-hq/dog-breed-classification-ml.git
     ```bash
     make delete
     ```
+## Kafka
+Prerequisites:
+* trained model
+* Docker
+* Docker Compsoe
+1. Download and start Confluent platform stack in detached mode
+    ```
+    make kafka
+    ```
+2. Run Seldon-Core and TensorFlow Serving
+    ```
+    make kafka-deploy
+    ```
+3. Run kafka consumer
+
+    * #### TensorFlow Serving
+        ```
+        CONFIG=TENSORFLOW python kafka_consumer.py
+        ```
+    * #### Seldon-Core
+        ```
+        python kafka_consumer.py
+        ```
+4. Send image with kafka producer
+    ```
+    python kafka_producer.py
+    ```

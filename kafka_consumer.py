@@ -16,9 +16,9 @@ config = os.getenv("CONFIG", "SELDON")
 
 def send_photo_to_slack(result):
     image = open("foo.png", 'rb').read()
-    client = WebClient("")
+    client = WebClient("Slack_Bot_User_OAuth_Token") #input OAuth token
     client.files_upload(
-        channels = "",
+        channels = "Slack_channel_id", #input channel id
         initial_comment = f"{result}",
         filename = "dog photo",
         content = image
