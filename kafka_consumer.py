@@ -1,3 +1,4 @@
+import logging
 from kafka import KafkaConsumer
 from base64 import decodebytes
 from PIL import Image
@@ -10,6 +11,7 @@ from slack_sdk import WebClient
 from seldon_core.seldon_client import SeldonClient
 import os
 
+logging.basicConfig(level=logging.INFO)
 config = os.getenv("CONFIG", "SELDON")
 
 def send_photo_to_slack(result):
@@ -26,7 +28,7 @@ def send_client_request(seldon_client, image):
     client_prediction = seldon_client.predict(
         data=image,
         deployment_name="seldon-dogbreed",
-        payload_type="ndarray",
+        payload_type="ndarray"
     )
     return client_prediction
 
@@ -72,13 +74,12 @@ def consumer():
     for message in consumer:
         with open("foo.png","wb") as f:
             f.write(decodebytes(message.value))
-        im = Image.open("foo.png")
-        im1 = im.resize((220,220))
-        image = np.array(im1)
-        image = image[None, ...]
-        # img = tf.keras.preprocessing.image.load_img("foo.png")
-        # image = tf.keras.preprocessing.image.img_to_array(img)
-        # image = image[None, ...]
+        img = tf.keras.utils.load_img(
+            "foo.png",
+            target_size=(224,224)
+        )
+        input_arr = tf.keras.utils.img_to_array(img)
+        image = input_arr[None, ...]
         if config=="TENSORFLOW":
             print("Tensorflow")
             result = predict_tfserve(image)
