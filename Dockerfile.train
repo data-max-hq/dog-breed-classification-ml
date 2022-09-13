@@ -1,4 +1,6 @@
-FROM python:3.8
+FROM kumatea/tensorflow:2.6.0-py36
+
+RUN apt update && apt install -y --fix-missing libhdf5-serial-dev hdf5-tools libhdf5-dev 
 
 RUN mkdir /models
 
@@ -8,6 +10,8 @@ ARG  CONFIG
 ENV CONFIG ${CONFIG}
 
 RUN pip install --upgrade pip
+
+RUN pip install --no-binary=h5py h5py
 
 COPY requirements.txt requirements.txt 
 RUN pip install -r requirements.txt 

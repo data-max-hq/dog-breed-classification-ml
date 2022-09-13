@@ -55,17 +55,6 @@ def get_test_generator():
     )
 
 
-dog_classifier = tf.keras.applications.ResNet50V2(
-    weights="imagenet", input_shape=(int(224), int(224), 3)
-)
-
-
-def is_dog(data):
-    probs = dog_classifier.predict(data)
-    preds = tf.argmax(probs, axis=1)
-    return (preds >= 151) & (preds <= 268)
-
-
 components.html(
     """
     <style>svg{
@@ -116,12 +105,7 @@ with tab2:
             image = test_generator.next()[0][0]
             image = image[None, ...]
 
-            if not is_dog(image):
-                with st.spinner("Checking if the image contains a dog..."):
-                    time.sleep(0.5)
-                    st.error("Please enter a dog photo!")
-            else:
-                with st.spinner("Predicting the breed..."):
+            with st.spinner("Predicting the breed..."):
                     if config == "SELDON":
                         prediction = send_client_request(sc, image)
                         response = prediction.response.get("data").get("ndarray")

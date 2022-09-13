@@ -1,8 +1,8 @@
-all-seldon: build-seldon start-seldon load-seldon install-kubeflow helm-seldon
+all-seldon: build-seldon start-seldon load-seldon install-kubeflow 
 all-tfserve: build-tfserve start-tfserve load-tfserve install-kubeflow 
 
 start-seldon:
-	minikube start --driver=docker --kubernetes-version=v1.21.6 
+	minikube start --driver=docker --kubernetes-version=v1.21.6 --cpus 5
 
 start-tfserve:
 	minikube start
@@ -42,8 +42,8 @@ deploy-tensorflow:
 	kubectl apply -f ./tensorflow
 
 build-tfserve:
-	docker pull tensorflow/serving
-	docker tag tensorflow/serving tfserve:minikube
+	docker pull emacski/tensorflow-serving:latest-linux_arm64
+	docker tag emacski/tensorflow-serving:latest-linux_arm64 tfserve:minikube
 	docker build -t trainmodel:minikube --build-arg CONFIG="KUBERNETES" --file Dockerfile.train .
 	docker build -t streamlit:minikube --build-arg CONFIG="TENSORFLOW" --file Dockerfile.streamlit .
 
