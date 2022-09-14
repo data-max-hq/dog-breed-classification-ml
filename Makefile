@@ -69,7 +69,8 @@ compose-tfserve:
 	docker compose -f docker-compose-tfserve.yaml up --build
 
 local-train:
-	python3 train_model.py
+	docker build -t trainmodel:minikube --build-arg CONFIG="KUBERNETES" --file Dockerfile.train .
+	docker run -t --rm -p 5002:5000  --mount type=bind,source=/Users/endriveizaj/Documents/dog-breed-classification-ml/models,target=/models trainmodel:minikube
 
 run:
 	python3 kubeflow_pipeline.py
